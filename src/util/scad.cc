@@ -43,10 +43,7 @@ Shape MakeComposite(const std::function<void(std::FILE*)>& write_name,
 
 Shape MakeLiteralComposite(const char* name, const std::vector<Shape>& shapes) {
   return Shape([=](std::FILE* file, int indent_level) {
-    WriteComposite(file,
-                   [=](std::FILE*) { fprintf(file, "%s", name); },
-                   shapes,
-                   indent_level);
+    WriteComposite(file, [=](std::FILE*) { fprintf(file, "%s", name); }, shapes, indent_level);
   });
 }
 
@@ -228,9 +225,7 @@ Shape Shape::Translate(const Vec3& v) const {
 }
 
 Shape Shape::Mirror(double x, double y, double z) const {
-  auto write_name = [=](std::FILE* file) {
-    fprintf(file, "mirror ([%.3f, %.3f, %.3f])", x, y, z);
-  };
+  auto write_name = [=](std::FILE* file) { fprintf(file, "mirror ([%.3f, %.3f, %.3f])", x, y, z); };
   return MakeComposite(write_name, {*this});
 }
 
@@ -240,8 +235,7 @@ Shape Shape::Mirror(const Vec3& v) const {
 
 Shape Shape::Rotate(double degrees, double x, double y, double z) const {
   auto write_name = [=](std::FILE* file) {
-    fprintf(
-        file, "rotate (a = %.3f, v = [%.3f, %.3f, %.3f])", degrees, x, y, z);
+    fprintf(file, "rotate (a = %.3f, v = [%.3f, %.3f, %.3f])", degrees, x, y, z);
   };
   return MakeComposite(write_name, {*this});
 }
@@ -287,23 +281,17 @@ Shape Shape::Color(double r, double g, double b, double a) const {
 }
 
 Shape Shape::Color(const std::string& color, double a) const {
-  auto write_name = [=](std::FILE* file) {
-    fprintf(file, "color (\"%s\", %f)", color.c_str(), a);
-  };
+  auto write_name = [=](std::FILE* file) { fprintf(file, "color (\"%s\", %f)", color.c_str(), a); };
   return MakeComposite(write_name, {*this});
 }
 
 Shape Shape::Alpha(double a) const {
-  auto write_name = [=](std::FILE* file) {
-    fprintf(file, "color (alpha = %.3f)", a);
-  };
+  auto write_name = [=](std::FILE* file) { fprintf(file, "color (alpha = %.3f)", a); };
   return MakeComposite(write_name, {*this});
 }
 
 Shape Shape::Scale(double x, double y, double z) const {
-  auto write_name = [=](std::FILE* file) {
-    fprintf(file, "scale ([%.3f, %.3f, %.3f])", x, y, z);
-  };
+  auto write_name = [=](std::FILE* file) { fprintf(file, "scale ([%.3f, %.3f, %.3f])", x, y, z); };
   return MakeComposite(write_name, {*this});
 }
 
@@ -320,8 +308,7 @@ Shape Shape::OffsetRadius(double r, bool chamfer) const {
 
 Shape Shape::OffsetDelta(double delta, bool chamfer) const {
   auto write_name = [=](std::FILE* file) {
-    fprintf(
-        file, "offset (delta = %.3f, chamfer = %s)", delta, BoolStr(chamfer));
+    fprintf(file, "offset (delta = %.3f, chamfer = %s)", delta, BoolStr(chamfer));
   };
   return MakeComposite(write_name, {*this});
 }
@@ -362,9 +349,7 @@ Shape Shape::Comment(const std::string& comment) const {
 }
 
 Shape Shape::Projection(bool cut) const {
-  auto write_name = [=](std::FILE* file) {
-    fprintf(file, "projection (cut = %s)", BoolStr(cut));
-  };
+  auto write_name = [=](std::FILE* file) { fprintf(file, "projection (cut = %s)", BoolStr(cut)); };
   return MakeComposite(write_name, {*this});
 }
 
@@ -388,10 +373,7 @@ void Shape::WriteToFile(const std::string& file_name) const {
 Shape Import(const std::string& file_name, int convexity) {
   return MakePrimitive([=](std::FILE* file) {
     if (convexity > 0) {
-      fprintf(file,
-              "import (file = \"%s\", convexity = %d);",
-              file_name.c_str(),
-              convexity);
+      fprintf(file, "import (file = \"%s\", convexity = %d);", file_name.c_str(), convexity);
     } else {
       fprintf(file, "import (file = \"%s\");", file_name.c_str());
     }

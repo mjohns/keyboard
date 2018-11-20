@@ -57,8 +57,7 @@ class Shape {
   }
   explicit Shape(std::shared_ptr<ScadWriter> scad) : scad_(std::move(scad)) {
   }
-  explicit Shape(ScadWriter scad)
-      : scad_(std::make_shared<ScadWriter>(std::move(scad))) {
+  explicit Shape(ScadWriter scad) : scad_(std::make_shared<ScadWriter>(std::move(scad))) {
   }
 
   void WriteToFile(const std::string& file_name) const;
@@ -73,24 +72,16 @@ class Shape {
   Shape Mirror(double x, double y, double z) const SCAD_WARN_UNUSED_RESULT;
   Shape Mirror(const Vec3& v) const SCAD_WARN_UNUSED_RESULT;
 
-  Shape Rotate(double degrees,
-               double x,
-               double y,
-               double z) const SCAD_WARN_UNUSED_RESULT;
+  Shape Rotate(double degrees, double x, double y, double z) const SCAD_WARN_UNUSED_RESULT;
   Shape RotateX(double degrees) const SCAD_WARN_UNUSED_RESULT;
   Shape RotateY(double degrees) const SCAD_WARN_UNUSED_RESULT;
   Shape RotateZ(double degrees) const SCAD_WARN_UNUSED_RESULT;
 
-  Shape LinearExtrude(const LinearExtrudeParams& params) const
-      SCAD_WARN_UNUSED_RESULT;
+  Shape LinearExtrude(const LinearExtrudeParams& params) const SCAD_WARN_UNUSED_RESULT;
   Shape LinearExtrude(double height) const SCAD_WARN_UNUSED_RESULT;
 
-  Shape Color(double r,
-              double g,
-              double b,
-              double a = 1.0) const SCAD_WARN_UNUSED_RESULT;
-  Shape Color(const std::string& color,
-              double a = 1) const SCAD_WARN_UNUSED_RESULT;
+  Shape Color(double r, double g, double b, double a = 1.0) const SCAD_WARN_UNUSED_RESULT;
+  Shape Color(const std::string& color, double a = 1) const SCAD_WARN_UNUSED_RESULT;
   Shape Alpha(double a) const SCAD_WARN_UNUSED_RESULT;
 
   Shape Subtract(const Shape& other) const SCAD_WARN_UNUSED_RESULT;
@@ -104,10 +95,8 @@ class Shape {
   Shape Scale(double x, double y, double z) const SCAD_WARN_UNUSED_RESULT;
   Shape Scale(double s) const SCAD_WARN_UNUSED_RESULT;
 
-  Shape OffsetRadius(double r,
-                     bool chamfer = false) const SCAD_WARN_UNUSED_RESULT;
-  Shape OffsetDelta(double delta,
-                    bool chamfer = false) const SCAD_WARN_UNUSED_RESULT;
+  Shape OffsetRadius(double r, bool chamfer = false) const SCAD_WARN_UNUSED_RESULT;
+  Shape OffsetDelta(double delta, bool chamfer = false) const SCAD_WARN_UNUSED_RESULT;
 
   Shape Comment(const std::string& comment) const SCAD_WARN_UNUSED_RESULT;
 
@@ -126,8 +115,7 @@ struct CubeParams {
   bool center = true;
 };
 Shape Cube(const CubeParams& params) SCAD_WARN_UNUSED_RESULT;
-Shape Cube(double x, double y, double z, bool center = true)
-    SCAD_WARN_UNUSED_RESULT;
+Shape Cube(double x, double y, double z, bool center = true) SCAD_WARN_UNUSED_RESULT;
 Shape Cube(double size, bool center = true) SCAD_WARN_UNUSED_RESULT;
 
 struct SphereParams {
@@ -156,9 +144,7 @@ struct CylinderParams {
   bool center = true;
 };
 Shape Cylinder(const CylinderParams& params) SCAD_WARN_UNUSED_RESULT;
-Shape Cylinder(double height,
-               double radius,
-               Optional<double> fn = {}) SCAD_WARN_UNUSED_RESULT;
+Shape Cylinder(double height, double radius, Optional<double> fn = {}) SCAD_WARN_UNUSED_RESULT;
 
 struct SquareParams {
   double x = 1;
@@ -203,10 +189,8 @@ Shape Intersection(const Shape& shape, const Shapes&... more_shapes) {
   return IntersectionAll({shape, more_shapes...});
 }
 
-Shape Import(const std::string& file_name,
-             int convexity = -1) SCAD_WARN_UNUSED_RESULT;
+Shape Import(const std::string& file_name, int convexity = -1) SCAD_WARN_UNUSED_RESULT;
 
-Shape Minkowski(const Shape& first,
-                const Shape& second) SCAD_WARN_UNUSED_RESULT;
+Shape Minkowski(const Shape& first, const Shape& second) SCAD_WARN_UNUSED_RESULT;
 
 }  // namespace scad

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace scad {
+namespace kb {
 namespace {
 
 const int kTabSize = 2;
@@ -384,4 +384,4 @@ Shape Minkowski(const Shape& first, const Shape& second) {
   return MakeLiteralComposite("minkowski ()", {first, second});
 }
 
-}  // namespace scad
+}  // namespace kb

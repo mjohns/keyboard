@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
+#include "util/scad.h"
 #include "util/transform.h"
 
 using std::cout;
@@ -15,4 +16,7 @@ int main() {
 
   glm::vec3 point = t.ApplyToPoint(glm::vec3(0, 0, 1));
   cout << "x: " << point.x << " y: " << point.y << " z: " << point.z << endl;
+
+  Shape sphere = Sphere(0.2);
+  t.ApplyToShape(sphere).WriteToFile("/tmp/transform_test.scad");
 }

@@ -1,0 +1,8 @@
+BasedOnStyle: Google
+
+ExperimentalAutoDetectBinPacking: true
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: false
+ColumnLimit: 100

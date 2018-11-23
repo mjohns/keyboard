@@ -2,35 +2,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "util",
-    srcs = [],
-    hdrs = ["util.h"],
-)
-
-cc_library(
-    name = "transform",
-    srcs = [],
-    hdrs = ["transform.h"],
-    deps = [
-        ":scad",
-        "//glm",
+    srcs = [
+        "frame.cc",
+        "scad.cc",
     ],
-)
-
-cc_binary(
-    name = "transform_test",
-    srcs = ["transform_test.cc"],
-    deps = [
-        ":scad",
-        ":transform",
-        "//glm",
+    hdrs = [
+        "util.h" +
+        "frame.h" +
+        "scad.h",
     ],
-)
-
-cc_library(
-    name = "scad",
-    srcs = ["scad.cc"],
-    hdrs = ["scad.h"],
     deps = [
-        ":util",
+        "//glm",
     ],
 )

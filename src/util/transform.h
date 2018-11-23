@@ -7,20 +7,47 @@
 
 namespace kb {
 
-// A transformation of a point or scad shape. First the rotations are applied and then the point
-// or shape is translated away from the origin.
-class Transform {
+glm::vec3 Rotate(const glm::vec3& p, double deg, double x, double y, double z) {
+  glm::mat4 rotation(1.0f);
+  rotation = glm::rotate(rotation, glm::radians(deg), glm::vec3(x, y, z));
+  glm::vec4 rotated = rotation * glm::vec4(p.x, p.y, p.z, 1);
+  return glm::vec3(rotated.x, rotated.y, rotated.z);
+}
+
+gmtl::Point3d RotateX(const glm::vec3& p, double deg) {
+  return Rotate(p, deg, 1, 0, 0);
+}
+
+gmtl::Point3d RotateY(const glm::vec3& p, double deg) {
+  return Rotate(p, deg, 0, 1, 0);
+}
+
+gmtl::Point3d RotateZ(const glm::vec3& p, double deg) {
+  return Rotate(p, deg, 0, 0, 1);
+}
+
+struct Frame {
  public:
-  float x = 0;
-  float y = 0;
-  float z = 0;
+  double x = 0;
+  double y = 0;
+  double z = 0;
 
   // Rotation in degrees
-  float rx = 0;
-  float ry = 0;
-  float rz = 0;
+  double rx = 0;
+  double ry = 0;
+  double rz = 0;
 
-  Shape ApplyToShape(const kb::Shape& in) {
+  Frame(double px, double py, double pz) {
+    x = px;
+    y = py;
+    z = pz;
+  }
+
+  glm::vec3 origin() const {
+    return glm::vec3(x, y, z);
+  }
+
+  Shape ApplyToShape(const Shape& in) {
     return in.RotateZ(rz).RotateX(rx).RotateY(ry).Translate(x, y, z);
   }
 

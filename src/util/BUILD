@@ -4,12 +4,14 @@ cc_library(
     name = "util",
     srcs = [
         "frame.cc",
+        "key.cc",
         "scad.cc",
     ],
     hdrs = [
-        "util.h",
         "frame.h",
+        "key.h",
         "scad.h",
+        "util.h",
     ],
     deps = [
         "//glm",

@@ -22,6 +22,9 @@ struct Frame {
   double ry = 0;
   double rz = 0;
 
+  Frame() {
+  }
+
   Frame(double px, double py, double pz) : x(px), y(py), z(pz) {
   }
 

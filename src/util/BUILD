@@ -7,8 +7,8 @@ cc_library(
         "scad.cc",
     ],
     hdrs = [
-        "util.h" +
-        "frame.h" +
+        "util.h",
+        "frame.h",
         "scad.h",
     ],
     deps = [

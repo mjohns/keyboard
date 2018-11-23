@@ -7,7 +7,8 @@ namespace kb {
 
 glm::vec3 Rotate(const glm::vec3& p, double deg, double x, double y, double z) {
   glm::mat4 rotation(1.0f);
-  rotation = glm::rotate(rotation, glm::radians(deg), glm::vec3(x, y, z));
+  float radians = glm::radians(deg);
+  rotation = glm::rotate(rotation, radians, glm::vec3(x, y, z));
   glm::vec4 rotated = rotation * glm::vec4(p.x, p.y, p.z, 1);
   return glm::vec3(rotated.x, rotated.y, rotated.z);
 }

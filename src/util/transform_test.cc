@@ -10,13 +10,17 @@ using std::endl;
 using namespace kb;
 
 int main() {
-  Transform t;
-  t.z = 2;
-  t.rx = 90;
+  TransformList transforms;
 
-  glm::vec3 point = t.ApplyToPoint(glm::vec3(0, 0, 1));
-  cout << "x: " << point.x << " y: " << point.y << " z: " << point.z << endl;
+  Transform& t = transforms.AddTransform();
+  t.rx = 45;
+
+  t = transforms.AddTransform();
+  t.z = 10;
+
+  t = transforms.AddTransform();
+  t.rz = 45;
 
   Shape sphere = Sphere(0.2);
-  t.ApplyToShape(sphere).WriteToFile("/tmp/transform_test.scad");
+  transforms.ApplyToShape(sphere).WriteToFile("/tmp/transform_test.scad");
 }

@@ -22,7 +22,8 @@ struct Frame {
   double ry = 0;
   double rz = 0;
 
-  Frame(double px, double py, double pz) : x(px), y(py), z(pz) {}
+  Frame(double px, double py, double pz) : x(px), y(py), z(pz) {
+  }
 
   glm::vec3 origin() const {
     return glm::vec3(x, y, z);

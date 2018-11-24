@@ -3,8 +3,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-#include "util/frame.h"
 #include "util/scad.h"
+#include "util/transform.h"
 
 namespace kb {
 
@@ -16,23 +16,24 @@ struct Key {
   }
 
   Key(double x, double y, double z) {
-    f.x = x;
-    f.y = y;
-    f.z = z;
+    t.x = x;
+    t.y = y;
+    t.z = z;
   }
 
-  Frame f;
+  Transform t;
   Key* parent = nullptr;
 
-  Frame GetAbsoluteFrame() const;
-  Frame GetSwitchFrame() const;
+  Transforms GetTransforms() const;
+  Transforms GetSwitchTransforms() const;
+
   Shape GetSwitch() const;
   Shape GetCap() const;
 
-  Frame GetTopRight() const;
-  Frame GetTopLeft() const;
-  Frame GetBottomRight() const;
-  Frame GetBottomLeft() const;
+  Transforms GetTopRight() const;
+  Transforms GetTopLeft() const;
+  Transforms GetBottomRight() const;
+  Transforms GetBottomLeft() const;
 };
 
 }  // namespace kb

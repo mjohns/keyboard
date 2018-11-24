@@ -48,4 +48,22 @@ Shape ApplyTransforms(Shape shape, const std::vector<Transform>& transforms);
 
 glm::vec3 ApplyTransforms(glm::vec3 point, const std::vector<Transform>& transforms);
 
+struct Transforms {
+ public:
+  std::vector<Transform> transforms;
+
+  Shape Apply(const Shape& shape) const {
+    return ApplyTransforms(shape, transforms);
+  }
+
+  glm::vec3 Apply(const glm::vec3& p) const {
+    return ApplyTransforms(p, transforms);
+  }
+
+  Transform& AddTransform(Transform t = {}) {
+    transforms.insert(transforms.begin(), t);
+    return transforms[0];
+  }
+};
+
 }  // namespace kb

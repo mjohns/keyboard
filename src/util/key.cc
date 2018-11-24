@@ -75,11 +75,15 @@ Shape MakeDsaCap() {
 
 TransformList Key::GetTransforms() const {
   Key* key = parent;
-  TransformList transforms;
-  transforms.Transform(local_transforms);
+  std::vector<const Key*> keys;
+  keys.push_back(this);
   while (key != nullptr) {
-    transforms.Transform(key->local_transforms);
+    keys.push_back(key);
     key = key->parent;
+  }
+  TransformList transforms;
+  for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
+    transforms.Concat((*rit)->local_transforms);
   }
   return transforms;
 }

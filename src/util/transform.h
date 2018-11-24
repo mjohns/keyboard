@@ -104,8 +104,9 @@ class TransformList {
     return Translate(0, 0, z);
   }
 
-  TransformList& Transform(const TransformList& other) {
+  TransformList& Concat(const TransformList& other) {
     transforms_.insert(transforms_.end(), other.transforms_.begin(), other.transforms_.end());
+    return *this;
   }
 
  private:

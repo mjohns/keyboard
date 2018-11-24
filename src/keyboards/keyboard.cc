@@ -6,8 +6,8 @@
 
 using namespace kb;
 
-const double kStride = 19;
-const double kNegStride = -1 * kStride;
+// const double kStride = 19;
+// const double kNegStride = -1 * kStride;
 
 int main() {
   std::vector<Key*> keys;
@@ -24,8 +24,8 @@ int main() {
   left.parent = &middle;
   left.t().ry = 20;
 
-
   std::vector<Shape> shapes;
-  shapes.push_back(first);
+  shapes.push_back(middle.GetCap().Color("blue"));
+  shapes.push_back(left.GetCap());
   UnionAll(shapes).WriteToFile("/tmp/simple.scad");
 }

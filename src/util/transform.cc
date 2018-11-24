@@ -20,15 +20,15 @@ glm::vec3 Transform::Apply(const glm::vec3& p) const {
 }
 
 Shape ApplyTransforms(Shape shape, const std::vector<Transform>& transforms) {
-  for (auto rit = transforms.rbegin(); rit != transforms.rend(); ++rit) {
-    shape = rit->Apply(shape);
+  for (auto& transform : transforms) {
+    shape = transform.Apply(shape);
   }
   return shape;
 }
 
 glm::vec3 ApplyTransforms(glm::vec3 point, const std::vector<Transform>& transforms) {
-  for (auto rit = transforms.rbegin(); rit != transforms.rend(); ++rit) {
-    point = rit->Apply(point);
+  for (auto& transform : transforms) {
+    point = transform.Apply(point);
   }
   return point;
 }

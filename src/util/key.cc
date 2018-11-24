@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "util/frame.h"
 #include "util/scad.h"
+#include "util/transform.h"
 
 namespace kb {
 namespace {
@@ -19,10 +19,6 @@ const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
 const double kDsaHalfSize = 16.2;
 
 const double kSwitchOffset = kSwitchWidth / 2 + kWallWidth;
-const Frame kTopLeft{-1 * kSwitchOffset, kSwitchOffset, 0};
-const Frame kTopRight{kSwitchOffset, kSwitchOffset, 0};
-const Frame kBottomRight{kSwitchOffset, -1 * kSwitchOffset, 0};
-const Frame kBottomLeft{-1 * kSwitchOffset, -1 * kSwitchOffset, 0};
 
 Shape MakeSwitch() {
   std::vector<Shape> shapes;
@@ -77,52 +73,53 @@ Shape MakeDsaCap() {
 
 }  // namespace
 
-Frame Key::GetAbsoluteFrame() const {
-  std::vector<const Key*> keys;
-  keys.push_back(this);
+Transforms Key::GetTransforms() const {
   Key* key = parent;
+  std::vector<Transform> transforms;
+  transforms.push_back(t);
   while (key != nullptr) {
-    keys.push_back(key);
+    transforms.push_back(key->t);
     key = key->parent;
   }
-  std::reverse(keys.begin(), keys.end());
-  Frame frame;
-  for (const Key* key : keys) {
-    frame = PlaceFrame(frame, key->f);
-  }
-  return frame;
+  return {transforms};
 }
 
-Frame Key::GetSwitchFrame() const {
-  double offset = -1 * kDsaHeight;
-  offset += -6.4;
-  Frame frame;
-  frame.z = offset;
-  return PlaceFrame(GetAbsoluteFrame(), frame);
+Transforms Key::GetSwitchTransforms() const {
+  Transforms transforms = GetTransforms();
+  transforms.AddTransform().z = -1 * kDsaHeight - 6.4;
+  return transforms;
 }
 
 Shape Key::GetSwitch() const {
-  return GetSwitchFrame().PlaceShape(MakeSwitch());
+  return GetSwitchTransforms().Apply(MakeSwitch());
 }
 
 Shape Key::GetCap() const {
-  return GetAbsoluteFrame().PlaceShape(MakeDsaCap());
+  return GetTransforms().Apply(MakeDsaCap());
 }
 
-Frame Key::GetTopRight() const {
-  return PlaceFrame(GetSwitchFrame(), kTopRight);
+Transforms Key::GetTopRight() const {
+  Transforms transforms = GetTransforms();
+  transforms.AddTransform({kSwitchOffset, kSwitchOffset, 0});
+  return transforms;
 }
 
-Frame Key::GetTopLeft() const {
-  return PlaceFrame(GetSwitchFrame(), kTopLeft);
+Transforms Key::GetTopLeft() const {
+  Transforms transforms = GetTransforms();
+  transforms.AddTransform({-1 * kSwitchOffset, kSwitchOffset, 0});
+  return transforms;
 }
 
-Frame Key::GetBottomRight() const {
-  return PlaceFrame(GetSwitchFrame(), kBottomRight);
+Transforms Key::GetBottomRight() const {
+  Transforms transforms = GetTransforms();
+  transforms.AddTransform({kSwitchOffset, -1 * kSwitchOffset, 0});
+  return transforms;
 }
 
-Frame Key::GetBottomLeft() const {
-  return PlaceFrame(GetSwitchFrame(), kBottomLeft);
+Transforms Key::GetBottomLeft() const {
+  Transforms transforms = GetTransforms();
+  transforms.AddTransform({-1 * kSwitchOffset, -1 * kSwitchOffset, 0});
+  return transforms;
 }
 
 Shape GetConnector() {

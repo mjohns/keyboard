@@ -6,41 +6,26 @@
 
 using namespace kb;
 
+const double kStride = 19;
+const double kNegStride = -1 * kStride;
+
 int main() {
+  std::vector<Key*> keys;
+
+  Key m2;
+  keys.push_back(&m2);
+
   Key middle;
-  middle.t.x = 19;
-  middle.t.y = 19;
-  middle.t.ry = 45;
-  middle.t.rz = 45;
+  keys.push_back(&middle);
+  middle.t().ry = 45;
+  middle.t().rz = 45;
 
   Key left(19, 0, 0);
   left.parent = &middle;
-  left.t.ry = 20;
+  left.t().ry = 20;
 
-  Shape first = Union(middle.GetCap().Color("blue"),
-                      left.GetCap().Color("yellow"),
-                      middle.GetBottomLeft().Apply(GetConnector()),
-                      middle.GetTopLeft().Apply(GetConnector()));
-
-  std::vector<Transform> transforms;
-
-  Transform m;
-  m.x = 19;
-  m.ry = 45;
-  m.rz = 45;
-
-  Transform l;
-  l.x = 19;
-  l.ry = 20;
-
-  transforms.push_back(m);
 
   std::vector<Shape> shapes;
-  shapes.push_back(ApplyTransforms(Key().GetCap(), transforms).Color("red"));
-
-  transforms.insert(transforms.begin(), l);
-  shapes.push_back(ApplyTransforms(Key().GetCap(), transforms).Color("green"));
-
   shapes.push_back(first);
   UnionAll(shapes).WriteToFile("/tmp/simple.scad");
 }

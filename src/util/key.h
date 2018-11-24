@@ -21,19 +21,23 @@ struct Key {
     t.z = z;
   }
 
-  Transform t;
+  TransformList local_transforms;
   Key* parent = nullptr;
 
-  Transforms GetTransforms() const;
-  Transforms GetSwitchTransforms() const;
+  Transform& t() {
+    return local_transforms.mutable_front();
+  }
+
+  TransformList GetTransforms() const;
+  TransformList GetSwitchTransforms() const;
 
   Shape GetSwitch() const;
   Shape GetCap() const;
 
-  Transforms GetTopRight() const;
-  Transforms GetTopLeft() const;
-  Transforms GetBottomRight() const;
-  Transforms GetBottomLeft() const;
+  TransformList GetTopRight() const;
+  TransformList GetTopLeft() const;
+  TransformList GetBottomRight() const;
+  TransformList GetBottomLeft() const;
 };
 
 }  // namespace kb

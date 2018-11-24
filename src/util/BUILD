@@ -6,11 +6,13 @@ cc_library(
         "frame.cc",
         "key.cc",
         "scad.cc",
+        "transform.cc",
     ],
     hdrs = [
         "frame.h",
         "key.h",
         "scad.h",
+        "transform.h",
         "util.h",
     ],
     deps = [

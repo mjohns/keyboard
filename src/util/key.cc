@@ -73,19 +73,19 @@ Shape MakeDsaCap() {
 
 }  // namespace
 
-Transforms Key::GetTransforms() const {
+TransformList Key::GetTransforms() const {
   Key* key = parent;
-  std::vector<Transform> transforms;
-  transforms.push_back(t);
+  TransformList transforms;
+  transforms.Transform(local_transforms);
   while (key != nullptr) {
-    transforms.push_back(key->t);
+    transforms.Transform(key->local_transforms);
     key = key->parent;
   }
-  return {transforms};
+  return transforms;
 }
 
-Transforms Key::GetSwitchTransforms() const {
-  Transforms transforms = GetTransforms();
+TransformList Key::GetSwitchTransforms() const {
+  TransformList transforms = GetTransforms();
   transforms.AddTransform().z = -1 * kDsaHeight - 6.4;
   return transforms;
 }
@@ -98,26 +98,26 @@ Shape Key::GetCap() const {
   return GetTransforms().Apply(MakeDsaCap());
 }
 
-Transforms Key::GetTopRight() const {
-  Transforms transforms = GetTransforms();
+TransformList Key::GetTopRight() const {
+  TransformList transforms = GetTransforms();
   transforms.AddTransform({kSwitchOffset, kSwitchOffset, 0});
   return transforms;
 }
 
-Transforms Key::GetTopLeft() const {
-  Transforms transforms = GetTransforms();
+TransformList Key::GetTopLeft() const {
+  TransformList transforms = GetTransforms();
   transforms.AddTransform({-1 * kSwitchOffset, kSwitchOffset, 0});
   return transforms;
 }
 
-Transforms Key::GetBottomRight() const {
-  Transforms transforms = GetTransforms();
+TransformList Key::GetBottomRight() const {
+  TransformList transforms = GetTransforms();
   transforms.AddTransform({kSwitchOffset, -1 * kSwitchOffset, 0});
   return transforms;
 }
 
-Transforms Key::GetBottomLeft() const {
-  Transforms transforms = GetTransforms();
+TransformList Key::GetBottomLeft() const {
+  TransformList transforms = GetTransforms();
   transforms.AddTransform({-1 * kSwitchOffset, -1 * kSwitchOffset, 0});
   return transforms;
 }

@@ -16,9 +16,9 @@ struct Key {
   }
 
   Key(double x, double y, double z) {
-    t.x = x;
-    t.y = y;
-    t.z = z;
+    t().x = x;
+    t().y = y;
+    t().z = z;
   }
 
   TransformList local_transforms;

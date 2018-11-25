@@ -12,20 +12,19 @@ using namespace kb;
 int main() {
   std::vector<Key*> keys;
 
+  double radius = 50;
+  Key top_template;
+  top_template.local_transform.TranslateZ(-1 * radius).RotateX(15).TranslateZ(radius);
+
+
   Key m2;
   keys.push_back(&m2);
 
-  Key middle;
-  keys.push_back(&middle);
-  middle.t().ry = 45;
-  middle.t().rz = 45;
-
-  Key left(19, 0, 0);
-  left.parent = &middle;
-  left.t().ry = 20;
+  Key t2 = top_template;
+  t2.parent = &m2;
 
   std::vector<Shape> shapes;
-  shapes.push_back(middle.GetCap().Color("blue"));
-  shapes.push_back(left.GetCap());
+  shapes.push_back(m2.GetCap());
+  shapes.push_back(t2.GetCap());
   UnionAll(shapes).WriteToFile("/tmp/simple.scad");
 }

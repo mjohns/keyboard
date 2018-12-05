@@ -9,6 +9,7 @@
 namespace kb {
 
 Shape GetConnector();
+Shape GetPostConnector();
 
 struct Key {
  public:
@@ -39,5 +40,8 @@ struct Key {
   TransformList GetBottomRight() const;
   TransformList GetBottomLeft() const;
 };
+
+Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector = GetPostConnector());
+Shape ConnectHorizontal(const Key& left, const Key& right, Shape connector = GetPostConnector());
 
 }  // namespace kb

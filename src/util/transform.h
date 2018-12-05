@@ -37,8 +37,21 @@ struct Transform {
     return glm::vec3(x, y, z);
   }
 
-  Shape Apply(const Shape& shape) const {
-    return shape.RotateZ(rz).RotateX(rx).RotateY(ry).Translate(x, y, z);
+  Shape Apply(const Shape& in) const {
+    Shape shape = in;
+    if (rz != 0) {
+      shape = shape.RotateZ(rz);
+    }
+    if (rx != 0) {
+      shape = shape.RotateX(rx);
+    }
+    if (ry != 0) {
+      shape = shape.RotateY(ry);
+    }
+    if (x != 0 || y != 0 || z != 0) {
+      shape = shape.Translate(x, y, z);
+    }
+    return shape;
   }
 
   glm::vec3 Apply(const glm::vec3& p) const;
@@ -104,7 +117,7 @@ class TransformList {
     return Translate(0, 0, z);
   }
 
-  TransformList& Concat(const TransformList& other) {
+  TransformList& Append(const TransformList& other) {
     transforms_.insert(transforms_.end(), other.transforms_.begin(), other.transforms_.end());
     return *this;
   }

@@ -82,16 +82,16 @@ TransformList Key::GetTransforms() const {
     key = key->parent;
   }
   TransformList transforms;
-  for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
-    transforms.Concat((*rit)->local_transforms);
+  for (auto it = keys.begin(); it != keys.end(); ++it) {
+    transforms.Append((*it)->local_transforms);
   }
   return transforms;
 }
 
 TransformList Key::GetSwitchTransforms() const {
-  TransformList transforms = GetTransforms();
+  TransformList transforms;
   transforms.AddTransform().z = -1 * kDsaHeight - 6.4;
-  return transforms;
+  return transforms.Append(GetTransforms());
 }
 
 Shape Key::GetSwitch() const {
@@ -103,34 +103,56 @@ Shape Key::GetCap() const {
 }
 
 TransformList Key::GetTopRight() const {
-  TransformList transforms = GetTransforms();
+  TransformList transforms;
   transforms.AddTransform({kSwitchOffset, kSwitchOffset, 0});
-  return transforms;
+  return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetTopLeft() const {
-  TransformList transforms = GetTransforms();
+  TransformList transforms;
   transforms.AddTransform({-1 * kSwitchOffset, kSwitchOffset, 0});
-  return transforms;
+  return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetBottomRight() const {
-  TransformList transforms = GetTransforms();
+  TransformList transforms;
   transforms.AddTransform({kSwitchOffset, -1 * kSwitchOffset, 0});
-  return transforms;
+  return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetBottomLeft() const {
-  TransformList transforms = GetTransforms();
+  TransformList transforms;
   transforms.AddTransform({-1 * kSwitchOffset, -1 * kSwitchOffset, 0});
-  return transforms;
+  return transforms.Append(GetSwitchTransforms());
 }
 
 Shape GetConnector() {
   SphereParams params;
   params.r = 2;
   params.fn = 30;
-  return Sphere(params).TranslateZ(kSwitchThickness / (-2.0));
+  return Sphere(params).TranslateZ(kSwitchThickness / -2.0);
+}
+
+Shape GetPostConnector() {
+  return Cube(.01, .01, kSwitchThickness).TranslateZ(kSwitchThickness / -2.0);
+}
+
+Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector) {
+  return Union(Hull(top.GetBottomRight().Apply(connector),
+                    top.GetBottomLeft().Apply(connector),
+                    bottom.GetTopLeft().Apply(connector)),
+               Hull(bottom.GetTopLeft().Apply(connector),
+                    bottom.GetTopRight().Apply(connector),
+                    top.GetBottomRight().Apply(connector)));
+}
+
+Shape ConnectHorizontal(const Key& left, const Key& right, Shape connector) {
+  return Union(Hull(left.GetTopRight().Apply(connector),
+                    left.GetBottomRight().Apply(connector),
+                    right.GetBottomLeft().Apply(connector)),
+               Hull(right.GetBottomLeft().Apply(connector),
+                    right.GetTopLeft().Apply(connector),
+                    left.GetTopRight().Apply(connector)));
 }
 
 }  // namespace kb

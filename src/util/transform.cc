@@ -21,16 +21,16 @@ glm::vec3 Transform::Apply(const glm::vec3& p) const {
 
 Shape TransformList::Apply(const Shape& in) const {
   Shape shape = in;
-  for (auto rit = transforms_.rbegin(); rit != transforms_.rend(); ++rit) {
-    shape = rit->Apply(shape);
+  for (auto& transform : transforms_) {
+    shape = transform.Apply(shape);
   }
   return shape;
 }
 
 glm::vec3 TransformList::Apply(const glm::vec3& in) const {
   glm::vec3 point = in;
-  for (auto rit = transforms_.rbegin(); rit != transforms_.rend(); ++rit) {
-    point = rit->Apply(point);
+  for (auto& transform : transforms_) {
+    point = transform.Apply(point);
   }
   return point;
 }

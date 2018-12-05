@@ -43,5 +43,10 @@ struct Key {
 
 Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector = GetPostConnector());
 Shape ConnectHorizontal(const Key& left, const Key& right, Shape connector = GetPostConnector());
+Shape ConnectDiagonal(const Key& top_left,
+                      const Key& top_right,
+                      const Key& bottom_right,
+                      const Key& bottom_left,
+                      Shape connector = GetPostConnector());
 
 }  // namespace kb

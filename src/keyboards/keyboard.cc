@@ -106,7 +106,54 @@ int main() {
     shapes.push_back(key->GetSwitch());
     //    shapes.push_back(key->GetCap().Color("red", .3));
   }
+
   shapes.push_back(ConnectHorizontal(m5, m4, GetConnector()));
+  shapes.push_back(ConnectHorizontal(m4, m3, GetConnector()));
+  shapes.push_back(ConnectHorizontal(m3, m2, GetConnector()));
+  shapes.push_back(ConnectHorizontal(m2, m1, GetConnector()));
+  shapes.push_back(ConnectHorizontal(m1, m0, GetConnector()));
+
+  shapes.push_back(ConnectHorizontal(t5, t4, GetConnector()));
+  shapes.push_back(ConnectHorizontal(t4, t3, GetConnector()));
+  shapes.push_back(ConnectHorizontal(t3, t2, GetConnector()));
+  shapes.push_back(ConnectHorizontal(t2, t1, GetConnector()));
+  shapes.push_back(ConnectHorizontal(t1, t0, GetConnector()));
+
+  shapes.push_back(ConnectHorizontal(b5, b4, GetConnector()));
+  shapes.push_back(ConnectHorizontal(b4, b3, GetConnector()));
+  shapes.push_back(ConnectHorizontal(b3, b2, GetConnector()));
+  shapes.push_back(ConnectHorizontal(b2, b1, GetConnector()));
+  shapes.push_back(ConnectHorizontal(b1, b0, GetConnector()));
+
+  shapes.push_back(ConnectVertical(t5, m5, GetConnector()));
+  shapes.push_back(ConnectVertical(m5, b5, GetConnector()));
+
+  shapes.push_back(ConnectVertical(t4, m4, GetConnector()));
+  shapes.push_back(ConnectVertical(m4, b4, GetConnector()));
+
+  shapes.push_back(ConnectVertical(t3, m3, GetConnector()));
+  shapes.push_back(ConnectVertical(m3, b3, GetConnector()));
+
+  shapes.push_back(ConnectVertical(t2, m2, GetConnector()));
+  shapes.push_back(ConnectVertical(m2, b2, GetConnector()));
+
+  shapes.push_back(ConnectVertical(t1, m1, GetConnector()));
+  shapes.push_back(ConnectVertical(m1, b1, GetConnector()));
+
+  shapes.push_back(ConnectVertical(t0, m0, GetConnector()));
+  shapes.push_back(ConnectVertical(m0, b0, GetConnector()));
+
+  shapes.push_back(ConnectDiagonal(t5, t4, m4, m5, GetConnector()));
+  shapes.push_back(ConnectDiagonal(t4, t3, m3, m4, GetConnector()));
+  shapes.push_back(ConnectDiagonal(t3, t2, m2, m3, GetConnector()));
+  shapes.push_back(ConnectDiagonal(t2, t1, m1, m2, GetConnector()));
+  shapes.push_back(ConnectDiagonal(t1, t0, m0, m1, GetConnector()));
+
+  shapes.push_back(ConnectDiagonal(m5, m4, b4, b5, GetConnector()));
+  shapes.push_back(ConnectDiagonal(m4, m3, b3, b4, GetConnector()));
+  shapes.push_back(ConnectDiagonal(m3, m2, b2, b3, GetConnector()));
+  shapes.push_back(ConnectDiagonal(m2, m1, b1, b2, GetConnector()));
+  shapes.push_back(ConnectDiagonal(m1, m0, b0, b1, GetConnector()));
 
   UnionAll(shapes).WriteToFile("/tmp/simple.scad");
 }

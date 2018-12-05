@@ -155,4 +155,17 @@ Shape ConnectHorizontal(const Key& left, const Key& right, Shape connector) {
                     left.GetTopRight().Apply(connector)));
 }
 
+Shape ConnectDiagonal(const Key& top_left,
+                      const Key& top_right,
+                      const Key& bottom_right,
+                      const Key& bottom_left,
+                      Shape connector) {
+  return Union(Hull(top_left.GetBottomRight().Apply(connector),
+                    top_right.GetBottomLeft().Apply(connector),
+                    bottom_right.GetTopLeft().Apply(connector)),
+               Hull(bottom_right.GetTopLeft().Apply(connector),
+                    bottom_left.GetTopRight().Apply(connector),
+                    top_left.GetBottomRight().Apply(connector)));
+}
+
 }  // namespace kb

@@ -106,7 +106,7 @@ int main() {
     shapes.push_back(key->GetSwitch());
     //    shapes.push_back(key->GetCap().Color("red", .3));
   }
-  shapes.push_back(ConnectHorizontal(m5, m4));
+  shapes.push_back(ConnectHorizontal(m5, m4, GetConnector()));
 
   UnionAll(shapes).WriteToFile("/tmp/simple.scad");
 }

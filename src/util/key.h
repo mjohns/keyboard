@@ -29,6 +29,10 @@ struct Key {
     return local_transforms.mutable_front();
   }
 
+  Transform& AddTransform() {
+    return local_transforms.AddTransformFront();
+  }
+
   TransformList GetTransforms() const;
   TransformList GetSwitchTransforms() const;
 

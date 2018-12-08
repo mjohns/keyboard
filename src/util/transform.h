@@ -67,6 +67,11 @@ class TransformList {
     return transforms_.back();
   }
 
+  Transform& AddTransformFront(Transform t = {}) {
+    transforms_.insert(transforms_.begin(), t);
+    return transforms_.front();
+  }
+
   bool empty() const {
     return transforms_.empty();
   }

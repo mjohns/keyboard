@@ -9,12 +9,15 @@ using namespace kb;
 int main() {
   std::vector<Key*> keys;
 
-  double radius = 50;
+  double radius = 60;
+  double rotation = 17;
   Key top_template;
-  top_template.local_transforms.TranslateZ(-1 * radius).RotateX(20).TranslateZ(radius);
+  top_template.local_transforms.TranslateZ(-1 * radius).RotateX(rotation).TranslateZ(radius);
 
   Key bottom_template;
-  bottom_template.local_transforms.TranslateZ(-1 * radius).RotateX(-20).TranslateZ(radius);
+  bottom_template.local_transforms.TranslateZ(-1 * radius)
+      .RotateX(-1 * rotation)
+      .TranslateZ(radius);
 
   // Middle Finger - d
   Key m2{-3, 3, 28.5};
@@ -31,6 +34,10 @@ int main() {
   Key b2 = bottom_template;
   b2.parent = &m2;
   keys.push_back(&b2);
+
+  Key bb2 = bottom_template;
+  bb2.parent = &b2;
+  keys.push_back(&bb2);
 
   // Index Finger - f
   Key m1{19.5, -2.7, 5.1};
@@ -84,6 +91,10 @@ int main() {
   Key b3 = bottom_template;
   b3.parent = &m3;
   keys.push_back(&b3);
+
+  Key bb3 = bottom_template;
+  bb3.parent = &b3;
+  keys.push_back(&bb3);
 
   // Pinky Finger - a
   Key m4{-20.2, -11.5, 6.3};

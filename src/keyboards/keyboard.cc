@@ -31,6 +31,10 @@ int main() {
   t2.parent = &m2;
   keys.push_back(&t2);
 
+  Key tt2 = top_template;
+  tt2.parent = &t2;
+  keys.push_back(&tt2);
+
   Key b2 = bottom_template;
   b2.parent = &m2;
   keys.push_back(&b2);
@@ -53,6 +57,10 @@ int main() {
   t1.parent = &m1;
   keys.push_back(&t1);
 
+  Key tt1 = top_template;
+  tt1.parent = &t1;
+  keys.push_back(&tt1);
+
   Key b1 = bottom_template;
   b1.parent = &m1;
   keys.push_back(&b1);
@@ -71,6 +79,10 @@ int main() {
   t0.parent = &m0;
   keys.push_back(&t0);
 
+  Key tt0 = top_template;
+  tt0.parent = &t0;
+  keys.push_back(&tt0);
+
   Key b0 = bottom_template;
   b0.parent = &m0;
   keys.push_back(&b0);
@@ -87,6 +99,10 @@ int main() {
   Key t3 = top_template;
   t3.parent = &m3;
   keys.push_back(&t3);
+
+  Key tt3 = top_template;
+  tt3.parent = &t3;
+  keys.push_back(&tt3);
 
   Key b3 = bottom_template;
   b3.parent = &m3;
@@ -109,6 +125,10 @@ int main() {
   t4.parent = &m4;
   keys.push_back(&t4);
 
+  Key tt4 = top_template;
+  tt4.parent = &t4;
+  keys.push_back(&tt4);
+
   Key b4 = bottom_template;
   b4.parent = &m4;
   keys.push_back(&b4);
@@ -122,6 +142,10 @@ int main() {
   Key t5 = top_template;
   t5.parent = &m5;
   keys.push_back(&t5);
+
+  Key tt5 = top_template;
+  tt5.parent = &t5;
+  keys.push_back(&tt5);
 
   Key b5 = bottom_template;
   b5.parent = &m5;

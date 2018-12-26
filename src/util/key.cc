@@ -1,6 +1,8 @@
 #include "util/key.h"
 
+#include <cassert>
 #include <memory>
+#include <unordered_set>
 
 #include "util/scad.h"
 #include "util/transform.h"
@@ -77,7 +79,10 @@ TransformList Key::GetTransforms() const {
   Key* key = parent;
   std::vector<const Key*> keys;
   keys.push_back(this);
+  std::unordered_set<Key*> visited;
   while (key != nullptr) {
+    bool inserted = visited.insert(key).second;
+    assert(inserted && "found cycle in parents");
     keys.push_back(key);
     key = key->parent;
   }

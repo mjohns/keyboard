@@ -114,7 +114,7 @@ int main() {
 
   // Pinky Finger - a
   Key m4{-20.2, -11.5, 6.3};
-  m4.t().y -= 1.5;
+  m4.t().y -= 2;
   m4.parent = &m3;
   m4.t().ry = 5;
   m4.AddTransform();

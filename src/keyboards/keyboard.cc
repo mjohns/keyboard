@@ -9,6 +9,7 @@ using namespace kb;
 const bool kIncludeConnectors = true;
 const bool kUseSphereConnector = false;
 const bool kShowManuform = false;
+const bool kAddCaps = false;
 
 Shape Connector() {
   return kUseSphereConnector ? GetConnector() : GetPostConnector();
@@ -56,6 +57,8 @@ int main() {
 
   Key bb2 = bottom_template;
   bb2.parent = &b2;
+  bb2.extra_width_right = 2;
+  bb2.extra_height_bottom = 2;
   keys.push_back(&bb2);
 
   // Index Finger - f
@@ -78,6 +81,8 @@ int main() {
 
   Key b1 = bottom_template;
   b1.parent = &m1;
+  b1.extra_z = 2;
+  b1.extra_height_bottom = 5;
   keys.push_back(&b1);
 
   // Innermost Column - g
@@ -100,6 +105,7 @@ int main() {
 
   Key b0 = bottom_template;
   b0.parent = &m0;
+  b0.extra_z = 2;
   keys.push_back(&b0);
 
   // Ring Finger - s
@@ -157,18 +163,22 @@ int main() {
   Key m5(-19.8, 0, 0.8);
   m5.parent = &m4;
   m5.t().ry = 5;
+  m5.extra_z = 2;
   keys.push_back(&m5);
 
   Key t5 = top_template;
   t5.parent = &m5;
+  t5.extra_z = 2;
   keys.push_back(&t5);
 
   Key tt5 = top_template;
   tt5.parent = &t5;
+  tt5.extra_z = 2;
   keys.push_back(&tt5);
 
   Key b5 = bottom_template;
   b5.parent = &m5;
+  b5.extra_z = 2;
   keys.push_back(&b5);
 
   // Thumb
@@ -181,98 +191,42 @@ int main() {
   th1.t().y -= 2;
   th1.AddTransform();
   th1.t().z = 1;
-  th1.extra_z = 3;
+  th1.extra_height_top = 2;
+  th1.extra_height_bottom = 2;
+  th1.extra_width_right = 1;
+  th1.extra_z = 1;
   keys.push_back(&th1);
 
   Key th2{20, -5, 3.2};
   th2.parent = &th1;
-  th2.extra_z = 3;
+  th2.extra_z = 1;
   keys.push_back(&th2);
 
   Key th2_t{0, 20, 2.2};
   th2_t.parent = &th2;
-  th2_t.extra_z = 3;
+  th2_t.extra_z = 2;
   keys.push_back(&th2_t);
 
   Key th3{20, -8, 1.5};
   th3.parent = &th2;
-  th3.extra_z = 3;
+  th3.extra_z = 2;
   keys.push_back(&th3);
 
   Key th3_t{0, 20, 4.2};
   th3_t.parent = &th3;
-  th3_t.extra_z = 3;
+  th3_t.extra_z = 3.5;
   keys.push_back(&th3_t);
-
-  /*
-  Key th_2;
-  th_2.relative_to = &th_2_r;
-  th_2.y -= 4;
-
-  Key th_3_r{44.5, -5.5, 2.2};
-  th_3_r.relative_to = &th_1;
-  th_3_r.rz = -27;
-  th_3_r.rx = 10;
-  th_3_r.ry = 5;
-
-  Key th_3;
-  th_3.relative_to = &th_3_r;
-
-  Key th_4_r{28, -24.5, -3.3};
-  th_4_r.relative_to = &th_1;
-  th_4_r.rz = -33;
-  th_4_r.rx = 6;
-  th_4_r.ry = 7;
-
-  Key th_4{-.8, 1, 0};
-  th_4.relative_to = &th_4_r;
-  th_4.rx = 3;
-  th_4.y -= 2;
-
-  Key th_5_r{20, -10, 1};
-  th_5_r.relative_to = &th_3_r;
-  th_5_r.rz = -11;
-
-  Key th_5{-.4, -0.5, -1.4};
-  th_5.relative_to = &th_5_r;
-  th_5.ry = 1;
-  th_5.rz = 1;
-
-  Key th_6_r{-1.3, -18.8, -5.5};
-  th_6_r.relative_to = &th_5_r;
-  th_6_r.rx = -11.5;
-  th_6_r.ry = -1;
-
-  Key th_6;
-  th_6.relative_to = &th_6_r;
-  th_6.rx = 3;
-  th_6.y -= 2;
-
-  Key th_7;
-  th_7.relative_to = &th_2;
-  th_7.y += 18.7;
-  th_7.x += 5;
-  th_7.z += 5.7;
-  th_7.rx = 7;
-  th_7.rz = -4;
-  th_7.ry = -2;
-
-  Key th_8;
-  th_8.relative_to = &th_7;
-  th_8.y -= 2.1;
-  th_8.x += 21;
-  th_8.z -= .1;
-  th_8.rz = -15;
-  th_8.ry = -3;
-  */
 
   std::vector<Shape> shapes;
   for (Key* key : keys) {
     shapes.push_back(key->GetSwitch());
-    //    shapes.push_back(key->GetCap().Color("red", .3));
+    if (kAddCaps) {
+      shapes.push_back(key->GetCap().Color("red", .3));
+    }
   }
 
   if (kIncludeConnectors) {
+    TransformList th_c1 = b1.GetBottomRight();
     std::vector<Shape> connectors = {
         // Connect middle row
         ConnectHorizontal(m5, m4, Connector()),
@@ -348,11 +302,31 @@ int main() {
         ConnectDiagonal(m2, m1, b1, b2, Connector()),
         ConnectDiagonal(m1, m0, b0, b1, Connector()),
 
+        ConnectDiagonal(b3, b2, bb2, bb3, Connector()),
+
         Tri(bb3.GetTopLeft(), bb3.GetBottomLeft(), b4.GetBottomRight(), Connector()),
         Tri(b3.GetBottomLeft(), bb3.GetTopLeft(), b4.GetBottomRight(), Connector()),
 
         Tri(th2_t.GetTopLeft(), b0.GetBottomLeft(), b0.GetBottomRight(), Connector()),
         Tri(th2_t.GetTopLeft(), th2_t.GetTopRight(), b0.GetBottomRight(), Connector()),
+
+        Tri(b1.GetBottomLeft(), bb2.GetTopRight(), b2.GetBottomRight(), Connector()),
+
+        // Thumb
+        ConnectHorizontal(th1, th2, Connector()),
+        ConnectHorizontal(th2, th3, Connector()),
+        ConnectHorizontal(th2_t, th3_t, Connector()),
+        ConnectVertical(th2_t, th2, Connector()),
+        ConnectVertical(th3_t, th3, Connector()),
+        ConnectDiagonal(th2_t, th3_t, th3, th2, Connector()),
+
+        Tri(th1.GetTopRight(), th2.GetTopLeft(), th2_t.GetBottomLeft(), Connector()),
+        Tri(th1.GetTopRight(), th2_t.GetTopLeft(), th2_t.GetBottomLeft(), Connector()),
+        Tri(b0.GetBottomLeft(), b1.GetBottomRight(), th2_t.GetTopLeft(), Connector()),
+        Tri(th1.GetTopRight(), b1.GetBottomRight(), th2_t.GetTopLeft(), Connector()),
+        ConnectVertical(b1, th1, Connector()),
+        Tri(b1.GetBottomLeft(), bb2.GetBottomRight(), th1.GetTopLeft(), Connector()),
+        Tri(th1.GetBottomLeft(), bb2.GetBottomRight(), th1.GetTopLeft(), Connector()),
 
     };
 
@@ -365,3 +339,65 @@ int main() {
 
   UnionAll(shapes).WriteToFile("simple.scad");
 }
+
+/*
+Key th_2;
+th_2.relative_to = &th_2_r;
+th_2.y -= 4;
+
+Key th_3_r{44.5, -5.5, 2.2};
+th_3_r.relative_to = &th_1;
+th_3_r.rz = -27;
+th_3_r.rx = 10;
+th_3_r.ry = 5;
+
+Key th_3;
+th_3.relative_to = &th_3_r;
+
+Key th_4_r{28, -24.5, -3.3};
+th_4_r.relative_to = &th_1;
+th_4_r.rz = -33;
+th_4_r.rx = 6;
+th_4_r.ry = 7;
+
+Key th_4{-.8, 1, 0};
+th_4.relative_to = &th_4_r;
+th_4.rx = 3;
+th_4.y -= 2;
+
+Key th_5_r{20, -10, 1};
+th_5_r.relative_to = &th_3_r;
+th_5_r.rz = -11;
+
+Key th_5{-.4, -0.5, -1.4};
+th_5.relative_to = &th_5_r;
+th_5.ry = 1;
+th_5.rz = 1;
+
+Key th_6_r{-1.3, -18.8, -5.5};
+th_6_r.relative_to = &th_5_r;
+th_6_r.rx = -11.5;
+th_6_r.ry = -1;
+
+Key th_6;
+th_6.relative_to = &th_6_r;
+th_6.rx = 3;
+th_6.y -= 2;
+
+Key th_7;
+th_7.relative_to = &th_2;
+th_7.y += 18.7;
+th_7.x += 5;
+th_7.z += 5.7;
+th_7.rx = 7;
+th_7.rz = -4;
+th_7.ry = -2;
+
+Key th_8;
+th_8.relative_to = &th_7;
+th_8.y -= 2.1;
+th_8.x += 21;
+th_8.z -= .1;
+th_8.rz = -15;
+th_8.ry = -3;
+*/

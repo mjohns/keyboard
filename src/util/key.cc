@@ -86,13 +86,22 @@ TransformList Key::GetTransforms() const {
 
 TransformList Key::GetSwitchTransforms() const {
   TransformList transforms;
-  transforms.AddTransform().z = -1 * kDsaHeight - 6.4;
+  transforms.AddTransform().z = -1 * kDsaHeight - 6.4 - extra_z;
   return transforms.Append(GetTransforms());
 }
 
-Shape Key::GetSwitch(bool add_side_nub) const {
+Shape Key::GetSwitch() const {
   std::vector<Shape> shapes;
-  shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(add_side_nub)));
+  if (extra_z > 0) {
+    shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(false)));
+    // Currently does not support extra_z > 4 due to only adding a single extra switch
+    TransformList transforms;
+    transforms.AddTransform({0, 0, extra_z});
+    transforms.Append(GetSwitchTransforms());
+    shapes.push_back(transforms.Apply(MakeSwitch(add_side_nub)));
+  } else {
+    shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(add_side_nub)));
+  }
   if (extra_height_top > 0) {
     shapes.push_back(Hull(GetTopRight().Apply(GetPostConnector()),
                           GetTopRightInternal().Apply(GetPostConnector()),

@@ -20,7 +20,7 @@ const double kDsaHalfSize = 16.2;
 
 const double kSwitchOffset = kSwitchWidth / 2 + kWallWidth;
 
-Shape GetConnector();
+Shape GetCapsuleConnector();
 Shape GetPostConnector();
 
 struct Key {

@@ -43,7 +43,8 @@ Shape MakeComposite(const std::function<void(std::FILE*)>& write_name,
 
 Shape MakeLiteralComposite(const char* name, const std::vector<Shape>& shapes) {
   return Shape([=](std::FILE* file, int indent_level) {
-    WriteComposite(file, [=](std::FILE*) { fprintf(file, "%s", name); }, shapes, indent_level);
+    WriteComposite(
+        file, [=](std::FILE*) { fprintf(file, "%s", name); }, shapes, indent_level);
   });
 }
 

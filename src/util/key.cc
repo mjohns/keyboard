@@ -10,19 +10,7 @@
 namespace kb {
 namespace {
 
-// All sizes in mm.
-const double kSwitchWidth = 14.4;
-const double kSwitchThickness = 4;
-const double kWallWidth = 2;
-
-const double kDsaHeight = 8;
-const double kDsaTopSize = 13.2;     // 0.5 * kMmPerInch;
-const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
-const double kDsaHalfSize = 16.2;
-
-const double kSwitchOffset = kSwitchWidth / 2 + kWallWidth;
-
-Shape MakeSwitch() {
+Shape MakeSwitch(bool add_side_nub) {
   std::vector<Shape> shapes;
   Shape top_wall = Cube(kSwitchWidth + kWallWidth * 2, kWallWidth, kSwitchThickness)
                        .Translate(0, kWallWidth / 2 + kSwitchWidth / 2, kSwitchThickness / 2);
@@ -32,11 +20,14 @@ Shape MakeSwitch() {
   shapes.push_back(top_wall.RotateZ(180));
   shapes.push_back(top_wall.RotateZ(270));
 
-  Shape side_nub = Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
-                            .Translate(kWallWidth / 2 + kSwitchWidth / 2, 0, kSwitchThickness / 2),
-                        Cylinder(2.75, 1, 30).RotateX(90).Translate(kSwitchWidth / 2, 0, 1));
-  shapes.push_back(side_nub);
-  shapes.push_back(side_nub.RotateZ(180));
+  if (add_side_nub) {
+    Shape side_nub =
+        Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
+                 .Translate(kWallWidth / 2 + kSwitchWidth / 2, 0, kSwitchThickness / 2),
+             Cylinder(2.75, 1, 30).RotateX(90).Translate(kSwitchWidth / 2, 0, 1));
+    shapes.push_back(side_nub);
+    shapes.push_back(side_nub.RotateZ(180));
+  }
 
   return UnionAll(shapes).TranslateZ(kSwitchThickness * -1);
 }
@@ -99,8 +90,8 @@ TransformList Key::GetSwitchTransforms() const {
   return transforms.Append(GetTransforms());
 }
 
-Shape Key::GetSwitch() const {
-  return GetSwitchTransforms().Apply(MakeSwitch());
+Shape Key::GetSwitch(bool add_side_nub) const {
+  return GetSwitchTransforms().Apply(MakeSwitch(add_side_nub));
 }
 
 Shape Key::GetCap() const {

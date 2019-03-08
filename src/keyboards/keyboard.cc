@@ -6,6 +6,21 @@
 
 using namespace kb;
 
+const bool kIncludeConnectors = true;
+const bool kUseSphereConnector = false;
+const bool kShowManuform = false;
+
+Shape Connector() {
+  return kUseSphereConnector ? GetConnector() : GetPostConnector();
+}
+
+Shape Tri(const TransformList& t1,
+          const TransformList& t2,
+          const TransformList& t3,
+          Shape connector) {
+  return Hull(t1.Apply(connector), t2.Apply(connector), t3.Apply(connector));
+}
+
 int main() {
   std::vector<Key*> keys;
 
@@ -159,14 +174,28 @@ int main() {
   th1.t().rx = 13.3;
   th1.t().ry = 21.6;
   th1.t().rz = -9;
+  th1.t().y -= 2;
   th1.AddTransform();
   th1.t().z = 1;
   keys.push_back(&th1);
 
-  /*
-  Key th_2_r{20, 4.65, 2.2};
-  th_2_r.relative_to = &th_1;
+  Key th2{20, -5, 3.2};
+  th2.parent = &th1;
+  keys.push_back(&th2);
 
+  Key th2_t{0, 20, 2.2};
+  th2_t.parent = &th2;
+  keys.push_back(&th2_t);
+
+  Key th3{20, -8, 1.5};
+  th3.parent = &th2;
+  keys.push_back(&th3);
+
+  Key th3_t{0, 20, 4.2};
+  th3_t.parent = &th3;
+  keys.push_back(&th3_t);
+
+  /*
   Key th_2;
   th_2.relative_to = &th_2_r;
   th_2.y -= 4;
@@ -234,57 +263,96 @@ int main() {
     //    shapes.push_back(key->GetCap().Color("red", .3));
   }
 
-  /*
-  shapes.push_back(ConnectHorizontal(m5, m4, GetConnector()));
-  shapes.push_back(ConnectHorizontal(m4, m3, GetConnector()));
-  shapes.push_back(ConnectHorizontal(m3, m2, GetConnector()));
-  shapes.push_back(ConnectHorizontal(m2, m1, GetConnector()));
-  shapes.push_back(ConnectHorizontal(m1, m0, GetConnector()));
+  if (kIncludeConnectors) {
+    std::vector<Shape> connectors = {
+        // Connect middle row
+        ConnectHorizontal(m5, m4, Connector()),
+        ConnectHorizontal(m4, m3, Connector()),
+        ConnectHorizontal(m3, m2, Connector()),
+        ConnectHorizontal(m2, m1, Connector()),
+        ConnectHorizontal(m1, m0, Connector()),
 
-  shapes.push_back(ConnectHorizontal(t5, t4, GetConnector()));
-  shapes.push_back(ConnectHorizontal(t4, t3, GetConnector()));
-  shapes.push_back(ConnectHorizontal(t3, t2, GetConnector()));
-  shapes.push_back(ConnectHorizontal(t2, t1, GetConnector()));
-  shapes.push_back(ConnectHorizontal(t1, t0, GetConnector()));
+        // Connect top row
+        ConnectHorizontal(t5, t4, Connector()),
+        ConnectHorizontal(t4, t3, Connector()),
+        ConnectHorizontal(t3, t2, Connector()),
+        ConnectHorizontal(t2, t1, Connector()),
+        ConnectHorizontal(t1, t0, Connector()),
 
-  shapes.push_back(ConnectHorizontal(b5, b4, GetConnector()));
-  shapes.push_back(ConnectHorizontal(b4, b3, GetConnector()));
-  shapes.push_back(ConnectHorizontal(b3, b2, GetConnector()));
-  shapes.push_back(ConnectHorizontal(b2, b1, GetConnector()));
-  shapes.push_back(ConnectHorizontal(b1, b0, GetConnector()));
+        // Connect top/top row
+        ConnectHorizontal(tt5, tt4, Connector()),
+        ConnectHorizontal(tt4, tt3, Connector()),
+        ConnectHorizontal(tt3, tt2, Connector()),
+        ConnectHorizontal(tt2, tt1, Connector()),
+        ConnectHorizontal(tt1, tt0, Connector()),
 
-  shapes.push_back(ConnectVertical(t5, m5, GetConnector()));
-  shapes.push_back(ConnectVertical(m5, b5, GetConnector()));
+        ConnectHorizontal(bb3, bb2, Connector()),
 
-  shapes.push_back(ConnectVertical(t4, m4, GetConnector()));
-  shapes.push_back(ConnectVertical(m4, b4, GetConnector()));
+        // Connect bottom row
+        ConnectHorizontal(b5, b4, Connector()),
+        ConnectHorizontal(b4, b3, Connector()),
+        ConnectHorizontal(b3, b2, Connector()),
+        ConnectHorizontal(b2, b1, Connector()),
+        ConnectHorizontal(b1, b0, Connector()),
 
-  shapes.push_back(ConnectVertical(t3, m3, GetConnector()));
-  shapes.push_back(ConnectVertical(m3, b3, GetConnector()));
+        ConnectVertical(tt5, t5, Connector()),
+        ConnectVertical(t5, m5, Connector()),
+        ConnectVertical(m5, b5, Connector()),
 
-  shapes.push_back(ConnectVertical(t2, m2, GetConnector()));
-  shapes.push_back(ConnectVertical(m2, b2, GetConnector()));
+        ConnectVertical(tt4, t4, Connector()),
+        ConnectVertical(t4, m4, Connector()),
+        ConnectVertical(m4, b4, Connector()),
 
-  shapes.push_back(ConnectVertical(t1, m1, GetConnector()));
-  shapes.push_back(ConnectVertical(m1, b1, GetConnector()));
+        ConnectVertical(tt3, t3, Connector()),
+        ConnectVertical(t3, m3, Connector()),
+        ConnectVertical(m3, b3, Connector()),
+        ConnectVertical(b3, bb3, Connector()),
 
-  shapes.push_back(ConnectVertical(t0, m0, GetConnector()));
-  shapes.push_back(ConnectVertical(m0, b0, GetConnector()));
+        ConnectVertical(tt2, t2, Connector()),
+        ConnectVertical(t2, m2, Connector()),
+        ConnectVertical(m2, b2, Connector()),
+        ConnectVertical(b2, bb2, Connector()),
 
-  shapes.push_back(ConnectDiagonal(t5, t4, m4, m5, GetConnector()));
-  shapes.push_back(ConnectDiagonal(t4, t3, m3, m4, GetConnector()));
-  shapes.push_back(ConnectDiagonal(t3, t2, m2, m3, GetConnector()));
-  shapes.push_back(ConnectDiagonal(t2, t1, m1, m2, GetConnector()));
-  shapes.push_back(ConnectDiagonal(t1, t0, m0, m1, GetConnector()));
+        ConnectVertical(tt1, t1, Connector()),
+        ConnectVertical(t1, m1, Connector()),
+        ConnectVertical(m1, b1, Connector()),
 
-  shapes.push_back(ConnectDiagonal(m5, m4, b4, b5, GetConnector()));
-  shapes.push_back(ConnectDiagonal(m4, m3, b3, b4, GetConnector()));
-  shapes.push_back(ConnectDiagonal(m3, m2, b2, b3, GetConnector()));
-  shapes.push_back(ConnectDiagonal(m2, m1, b1, b2, GetConnector()));
-  shapes.push_back(ConnectDiagonal(m1, m0, b0, b1, GetConnector()));
-  */
+        ConnectVertical(tt0, t0, Connector()),
+        ConnectVertical(t0, m0, Connector()),
+        ConnectVertical(m0, b0, Connector()),
 
-  shapes.push_back(Import("/tmp/left.stl").Color("green", .3));
+        ConnectDiagonal(t5, t4, m4, m5, Connector()),
+        ConnectDiagonal(t4, t3, m3, m4, Connector()),
+        ConnectDiagonal(t3, t2, m2, m3, Connector()),
+        ConnectDiagonal(t2, t1, m1, m2, Connector()),
+        ConnectDiagonal(t1, t0, m0, m1, Connector()),
 
-  UnionAll(shapes).WriteToFile("/tmp/simple.scad");
+        ConnectDiagonal(tt5, tt4, t4, t5, Connector()),
+        ConnectDiagonal(tt4, tt3, t3, t4, Connector()),
+        ConnectDiagonal(tt3, tt2, t2, t3, Connector()),
+        ConnectDiagonal(tt2, tt1, t1, t2, Connector()),
+        ConnectDiagonal(tt1, tt0, t0, t1, Connector()),
+
+        ConnectDiagonal(m5, m4, b4, b5, Connector()),
+        ConnectDiagonal(m4, m3, b3, b4, Connector()),
+        ConnectDiagonal(m3, m2, b2, b3, Connector()),
+        ConnectDiagonal(m2, m1, b1, b2, Connector()),
+        ConnectDiagonal(m1, m0, b0, b1, Connector()),
+
+        Tri(bb3.GetTopLeft(), bb3.GetBottomLeft(), b4.GetBottomRight(), Connector()),
+        Tri(b3.GetBottomLeft(), bb3.GetTopLeft(), b4.GetBottomRight(), Connector()),
+
+        Tri(th2_t.GetTopLeft(), b0.GetBottomLeft(), b0.GetBottomRight(), Connector()),
+        Tri(th2_t.GetTopLeft(), th2_t.GetTopRight(), b0.GetBottomRight(), Connector()),
+
+    };
+
+    shapes.insert(shapes.end(), connectors.begin(), connectors.end());
+  }
+
+  if (kShowManuform) {
+    shapes.push_back(Import("left.stl").Color("green", .3));
+  }
+
+  UnionAll(shapes).WriteToFile("simple.scad");
 }

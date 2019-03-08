@@ -177,7 +177,7 @@ int main() {
   th1.t().y -= 2;
   th1.AddTransform();
   th1.t().z = 1;
-  th1.extra_width = 4, keys.push_back(&th1);
+  keys.push_back(&th1);
 
   Key th2{20, -5, 3.2};
   th2.parent = &th1;

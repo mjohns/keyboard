@@ -37,8 +37,10 @@ struct Key {
   TransformList local_transforms;
   Key* parent = nullptr;
 
-  double extra_height = 0;
-  double extra_width = 0;
+  double extra_height_top = 0;
+  double extra_height_bottom = 0;
+  double extra_width_left = 0;
+  double extra_width_right = 0;
 
   Transform& t() {
     return local_transforms.mutable_front();

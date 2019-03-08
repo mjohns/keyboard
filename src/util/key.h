@@ -41,6 +41,9 @@ struct Key {
   double extra_height_bottom = 0;
   double extra_width_left = 0;
   double extra_width_right = 0;
+  double extra_z = 0;
+
+  bool add_side_nub = true;
 
   Transform& t() {
     return local_transforms.mutable_front();
@@ -53,7 +56,7 @@ struct Key {
   TransformList GetTransforms() const;
   TransformList GetSwitchTransforms() const;
 
-  Shape GetSwitch(bool add_side_nub = true) const;
+  Shape GetSwitch() const;
   Shape GetCap() const;
 
   TransformList GetTopRight() const;

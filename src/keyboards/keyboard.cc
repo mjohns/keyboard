@@ -135,18 +135,22 @@ int main() {
   m4.AddTransform();
   m4.t().z = .2;
   m4.t().y = -.45;
+  m4.extra_z = 2;
   keys.push_back(&m4);
 
   Key t4 = top_template;
   t4.parent = &m4;
+  t4.extra_z = 2;
   keys.push_back(&t4);
 
   Key tt4 = top_template;
   tt4.parent = &t4;
+  tt4.extra_z = 2;
   keys.push_back(&tt4);
 
   Key b4 = bottom_template;
   b4.parent = &m4;
+  b4.extra_z = 2;
   keys.push_back(&b4);
 
   // Shift Column
@@ -177,22 +181,27 @@ int main() {
   th1.t().y -= 2;
   th1.AddTransform();
   th1.t().z = 1;
+  th1.extra_z = 3;
   keys.push_back(&th1);
 
   Key th2{20, -5, 3.2};
   th2.parent = &th1;
+  th2.extra_z = 3;
   keys.push_back(&th2);
 
   Key th2_t{0, 20, 2.2};
   th2_t.parent = &th2;
+  th2_t.extra_z = 3;
   keys.push_back(&th2_t);
 
   Key th3{20, -8, 1.5};
   th3.parent = &th2;
+  th3.extra_z = 3;
   keys.push_back(&th3);
 
   Key th3_t{0, 20, 4.2};
   th3_t.parent = &th3;
+  th3_t.extra_z = 3;
   keys.push_back(&th3_t);
 
   /*

@@ -37,6 +37,9 @@ struct Key {
   TransformList local_transforms;
   Key* parent = nullptr;
 
+  double extra_height = 0;
+  double extra_width = 0;
+
   Transform& t() {
     return local_transforms.mutable_front();
   }
@@ -55,6 +58,12 @@ struct Key {
   TransformList GetTopLeft() const;
   TransformList GetBottomRight() const;
   TransformList GetBottomLeft() const;
+
+ private:
+  TransformList GetTopRightInternal() const;
+  TransformList GetTopLeftInternal() const;
+  TransformList GetBottomRightInternal() const;
+  TransformList GetBottomLeftInternal() const;
 };
 
 Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector = GetPostConnector());

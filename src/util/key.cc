@@ -100,11 +100,23 @@ Shape Key::GetCap() const {
 
 TransformList Key::GetTopRight() const {
   TransformList transforms;
+  transforms.AddTransform({extra_width, extra_height, 0});
+  return transforms.Append(GetTopRightInternal());
+}
+
+TransformList Key::GetTopRightInternal() const {
+  TransformList transforms;
   transforms.AddTransform({kSwitchOffset, kSwitchOffset, 0});
   return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetTopLeft() const {
+  TransformList transforms;
+  transforms.AddTransform({-1 * extra_width, extra_height, 0});
+  return transforms.Append(GetTopLeftInternal());
+}
+
+TransformList Key::GetTopLeftInternal() const {
   TransformList transforms;
   transforms.AddTransform({-1 * kSwitchOffset, kSwitchOffset, 0});
   return transforms.Append(GetSwitchTransforms());
@@ -112,11 +124,23 @@ TransformList Key::GetTopLeft() const {
 
 TransformList Key::GetBottomRight() const {
   TransformList transforms;
+  transforms.AddTransform({extra_width, -1 * extra_height, 0});
+  return transforms.Append(GetBottomRightInternal());
+}
+
+TransformList Key::GetBottomRightInternal() const {
+  TransformList transforms;
   transforms.AddTransform({kSwitchOffset, -1 * kSwitchOffset, 0});
   return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetBottomLeft() const {
+  TransformList transforms;
+  transforms.AddTransform({-1 * extra_width, -1 * extra_height, 0});
+  return transforms.Append(GetBottomLeftInternal());
+}
+
+TransformList Key::GetBottomLeftInternal() const {
   TransformList transforms;
   transforms.AddTransform({-1 * kSwitchOffset, -1 * kSwitchOffset, 0});
   return transforms.Append(GetSwitchTransforms());

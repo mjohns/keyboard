@@ -93,12 +93,8 @@ TransformList Key::GetSwitchTransforms() const {
 Shape Key::GetSwitch() const {
   std::vector<Shape> shapes;
   if (extra_z > 0) {
-    shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(false)));
-    // Currently does not support extra_z > 4 due to only adding a single extra switch
-    TransformList transforms;
-    transforms.AddTransform({0, 0, extra_z});
-    transforms.Append(GetSwitchTransforms());
-    shapes.push_back(transforms.Apply(MakeSwitch(add_side_nub)));
+    Shape s = Union(MakeSwitch(false), MakeSwitch(add_side_nub).TranslateZ(extra_z));
+    shapes.push_back(GetSwitchTransforms().Apply(s));
   } else {
     shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(add_side_nub)));
   }

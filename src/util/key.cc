@@ -91,27 +91,33 @@ TransformList Key::GetSwitchTransforms() const {
 }
 
 Shape Key::GetSwitch(bool add_side_nub) const {
-  Shape s = GetSwitchTransforms().Apply(MakeSwitch(add_side_nub));
-  if (extra_height > 0 || extra_width > 0) {
-    return Union(s,
-                 Hull(GetTopRight().Apply(GetPostConnector()),
-                      GetTopRightInternal().Apply(GetPostConnector()),
-                      GetBottomRightInternal().Apply(GetPostConnector()),
-                      GetBottomRight().Apply(GetPostConnector())),
-                 Hull(GetTopRight().Apply(GetPostConnector()),
-                      GetTopRightInternal().Apply(GetPostConnector()),
-                      GetTopLeftInternal().Apply(GetPostConnector()),
-                      GetTopLeft().Apply(GetPostConnector())),
-                 Hull(GetBottomRight().Apply(GetPostConnector()),
-                      GetBottomRightInternal().Apply(GetPostConnector()),
-                      GetBottomLeftInternal().Apply(GetPostConnector()),
-                      GetBottomLeft().Apply(GetPostConnector())),
-                 Hull(GetTopLeft().Apply(GetPostConnector()),
-                      GetTopLeftInternal().Apply(GetPostConnector()),
-                      GetBottomLeftInternal().Apply(GetPostConnector()),
-                      GetBottomLeft().Apply(GetPostConnector())));
+  std::vector<Shape> shapes;
+  shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(add_side_nub)));
+  if (extra_height_top > 0) {
+    shapes.push_back(Hull(GetTopRight().Apply(GetPostConnector()),
+                          GetTopRightInternal().Apply(GetPostConnector()),
+                          GetTopLeftInternal().Apply(GetPostConnector()),
+                          GetTopLeft().Apply(GetPostConnector())));
   }
-  return s;
+  if (extra_height_bottom > 0) {
+    shapes.push_back(Hull(GetBottomLeft().Apply(GetPostConnector()),
+                          GetBottomLeftInternal().Apply(GetPostConnector()),
+                          GetBottomRightInternal().Apply(GetPostConnector()),
+                          GetBottomRight().Apply(GetPostConnector())));
+  }
+  if (extra_width_left > 0) {
+    shapes.push_back(Hull(GetBottomLeft().Apply(GetPostConnector()),
+                          GetBottomLeftInternal().Apply(GetPostConnector()),
+                          GetTopLeftInternal().Apply(GetPostConnector()),
+                          GetTopLeft().Apply(GetPostConnector())));
+  }
+  if (extra_width_right > 0) {
+    shapes.push_back(Hull(GetBottomRight().Apply(GetPostConnector()),
+                          GetBottomRightInternal().Apply(GetPostConnector()),
+                          GetTopRightInternal().Apply(GetPostConnector()),
+                          GetTopRight().Apply(GetPostConnector())));
+  }
+  return UnionAll(shapes);
 }
 
 Shape Key::GetCap() const {
@@ -120,7 +126,7 @@ Shape Key::GetCap() const {
 
 TransformList Key::GetTopRight() const {
   TransformList transforms;
-  transforms.AddTransform({extra_width, extra_height, 0});
+  transforms.AddTransform({extra_width_right, extra_height_top, 0});
   return transforms.Append(GetTopRightInternal());
 }
 
@@ -132,7 +138,7 @@ TransformList Key::GetTopRightInternal() const {
 
 TransformList Key::GetTopLeft() const {
   TransformList transforms;
-  transforms.AddTransform({-1 * extra_width, extra_height, 0});
+  transforms.AddTransform({-1 * extra_width_left, extra_height_top, 0});
   return transforms.Append(GetTopLeftInternal());
 }
 
@@ -144,7 +150,7 @@ TransformList Key::GetTopLeftInternal() const {
 
 TransformList Key::GetBottomRight() const {
   TransformList transforms;
-  transforms.AddTransform({extra_width, -1 * extra_height, 0});
+  transforms.AddTransform({extra_width_right, -1 * extra_height_bottom, 0});
   return transforms.Append(GetBottomRightInternal());
 }
 
@@ -156,7 +162,7 @@ TransformList Key::GetBottomRightInternal() const {
 
 TransformList Key::GetBottomLeft() const {
   TransformList transforms;
-  transforms.AddTransform({-1 * extra_width, -1 * extra_height, 0});
+  transforms.AddTransform({-1 * extra_width_left, -1 * extra_height_bottom, 0});
   return transforms.Append(GetBottomLeftInternal());
 }
 

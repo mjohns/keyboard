@@ -91,7 +91,27 @@ TransformList Key::GetSwitchTransforms() const {
 }
 
 Shape Key::GetSwitch(bool add_side_nub) const {
-  return GetSwitchTransforms().Apply(MakeSwitch(add_side_nub));
+  Shape s = GetSwitchTransforms().Apply(MakeSwitch(add_side_nub));
+  if (extra_height > 0 || extra_width > 0) {
+    return Union(s,
+                 Hull(GetTopRight().Apply(GetPostConnector()),
+                      GetTopRightInternal().Apply(GetPostConnector()),
+                      GetBottomRightInternal().Apply(GetPostConnector()),
+                      GetBottomRight().Apply(GetPostConnector())),
+                 Hull(GetTopRight().Apply(GetPostConnector()),
+                      GetTopRightInternal().Apply(GetPostConnector()),
+                      GetTopLeftInternal().Apply(GetPostConnector()),
+                      GetTopLeft().Apply(GetPostConnector())),
+                 Hull(GetBottomRight().Apply(GetPostConnector()),
+                      GetBottomRightInternal().Apply(GetPostConnector()),
+                      GetBottomLeftInternal().Apply(GetPostConnector()),
+                      GetBottomLeft().Apply(GetPostConnector())),
+                 Hull(GetTopLeft().Apply(GetPostConnector()),
+                      GetTopLeftInternal().Apply(GetPostConnector()),
+                      GetBottomLeftInternal().Apply(GetPostConnector()),
+                      GetBottomLeft().Apply(GetPostConnector())));
+  }
+  return s;
 }
 
 Shape Key::GetCap() const {

@@ -94,6 +94,9 @@ Shape Key::GetSwitch() const {
   std::vector<Shape> shapes;
   if (extra_z > 0) {
     Shape s = Union(MakeSwitch(false), MakeSwitch(add_side_nub).TranslateZ(extra_z));
+    if (extra_z > 4) {
+      s+= MakeSwitch(false).TranslateZ(4);
+    }
     shapes.push_back(GetSwitchTransforms().Apply(s));
   } else {
     shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(add_side_nub)));

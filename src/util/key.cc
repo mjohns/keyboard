@@ -177,11 +177,11 @@ TransformList Key::GetBottomLeftInternal() const {
   return transforms.Append(GetSwitchTransforms());
 }
 
-Shape GetConnector() {
+Shape GetCapsuleConnector() {
   SphereParams params;
-  params.r = 2;
+  params.r = 1;
   params.fn = 30;
-  return Sphere(params).TranslateZ(kSwitchThickness / -2.0);
+  return Hull(Sphere(params).TranslateZ(-1), Sphere(params).TranslateZ(-3));
 }
 
 Shape GetPostConnector() {

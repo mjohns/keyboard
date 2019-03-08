@@ -7,12 +7,12 @@
 using namespace kb;
 
 const bool kIncludeConnectors = true;
-const bool kUseSphereConnector = false;
+const bool kUseCapsuleConnector = true;
 const bool kShowManuform = false;
 const bool kAddCaps = false;
 
 Shape Connector() {
-  return kUseSphereConnector ? GetConnector() : GetPostConnector();
+  return kUseCapsuleConnector ? GetCapsuleConnector() : GetPostConnector();
 }
 
 Shape Tri(const TransformList& t1,
@@ -41,10 +41,14 @@ int main() {
   m2.AddTransform();
   m2.t().x = -.3;
   m2.t().z = 1;
+  m2.extra_width_left = 1;
+  m2.extra_width_right = 1;
   keys.push_back(&m2);
 
   Key t2 = top_template;
   t2.parent = &m2;
+  t2.extra_width_left = 1;
+  t2.extra_width_right = 1;
   keys.push_back(&t2);
 
   Key tt2 = top_template;
@@ -53,6 +57,8 @@ int main() {
 
   Key b2 = bottom_template;
   b2.parent = &m2;
+  b2.extra_width_left = 1;
+  b2.extra_width_right = 1;
   keys.push_back(&b2);
 
   Key bb2 = bottom_template;
@@ -69,14 +75,17 @@ int main() {
   m1.t().x = .2;
   m1.t().z = .2;
   m1.t().y = -.2;
+  m1.extra_z = 2;
   keys.push_back(&m1);
 
   Key t1 = top_template;
   t1.parent = &m1;
+  t1.extra_z = 2;
   keys.push_back(&t1);
 
   Key tt1 = top_template;
   tt1.parent = &t1;
+  tt1.extra_z = 3;
   keys.push_back(&tt1);
 
   Key b1 = bottom_template;
@@ -115,18 +124,22 @@ int main() {
   m3.AddTransform();
   m3.t().x = .2;
   m3.t().z = .28;
+  m3.extra_z = 2;
   keys.push_back(&m3);
 
   Key t3 = top_template;
   t3.parent = &m3;
+  t3.extra_z = 2;
   keys.push_back(&t3);
 
   Key tt3 = top_template;
   tt3.parent = &t3;
+  tt3.extra_z = 3;
   keys.push_back(&tt3);
 
   Key b3 = bottom_template;
   b3.parent = &m3;
+  b3.extra_z = 2;
   keys.push_back(&b3);
 
   Key bb3 = bottom_template;
@@ -192,7 +205,7 @@ int main() {
   th1.AddTransform();
   th1.t().z = 1;
   th1.extra_height_top = 2;
-  th1.extra_height_bottom = 2;
+  th1.extra_height_bottom = 4;
   th1.extra_width_right = 1;
   th1.extra_z = 1;
   keys.push_back(&th1);
@@ -200,6 +213,7 @@ int main() {
   Key th2{20, -5, 3.2};
   th2.parent = &th1;
   th2.extra_z = 1;
+  th2.extra_height_bottom = 3;
   keys.push_back(&th2);
 
   Key th2_t{0, 20, 2.2};
@@ -215,6 +229,7 @@ int main() {
   Key th3_t{0, 20, 4.2};
   th3_t.parent = &th3;
   th3_t.extra_z = 3.5;
+  th3_t.extra_height_top = 4;
   keys.push_back(&th3_t);
 
   std::vector<Shape> shapes;

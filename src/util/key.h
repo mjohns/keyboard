@@ -8,6 +8,18 @@
 
 namespace kb {
 
+// All sizes in mm.
+const double kSwitchWidth = 14.4;
+const double kSwitchThickness = 4;
+const double kWallWidth = 2;
+
+const double kDsaHeight = 8;
+const double kDsaTopSize = 13.2;     // 0.5 * kMmPerInch;
+const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
+const double kDsaHalfSize = 16.2;
+
+const double kSwitchOffset = kSwitchWidth / 2 + kWallWidth;
+
 Shape GetConnector();
 Shape GetPostConnector();
 
@@ -36,7 +48,7 @@ struct Key {
   TransformList GetTransforms() const;
   TransformList GetSwitchTransforms() const;
 
-  Shape GetSwitch() const;
+  Shape GetSwitch(bool add_side_nub = true) const;
   Shape GetCap() const;
 
   TransformList GetTopRight() const;

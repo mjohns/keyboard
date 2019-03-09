@@ -1,7 +1,7 @@
 #include <functional>
 #include <glm/glm.hpp>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "util/key.h"
 #include "util/scad.h"
@@ -14,10 +14,8 @@ const bool kUseCapsuleConnector = true;
 const bool kShowManuform = false;
 const bool kAddCaps = true;
 
-std::ostream &operator<< (std::ostream &out, const glm::vec3 &vec) {
-  out << "{" 
-    << vec.x << " " << vec.y << " "<< vec.z 
-    << "}";
+std::ostream& operator<<(std::ostream& out, const glm::vec3& vec) {
+  out << "{" << vec.x << " " << vec.y << " " << vec.z << "}";
   return out;
 }
 

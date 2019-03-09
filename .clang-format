@@ -1,6 +1,6 @@
 BasedOnStyle: Google
 
-ExperimentalAutoDetectBinPacking: true
+ExperimentalAutoDetectBinPacking: false
 BinPackParameters: false
 BinPackArguments: false
 AllowAllParametersOfDeclarationOnNextLine: true

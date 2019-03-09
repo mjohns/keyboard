@@ -187,6 +187,13 @@ Shape GetCapsuleConnector() {
   return Hull(Sphere(params).TranslateZ(-1), Sphere(params).TranslateZ(-3));
 }
 
+Shape GetSphereConnector() {
+  SphereParams params;
+  params.r = 2;
+  params.fn = 30;
+  return Sphere(params).TranslateZ(-2);
+}
+
 Shape GetPostConnector() {
   return Cube(.01, .01, kSwitchThickness).TranslateZ(kSwitchThickness / -2.0);
 }

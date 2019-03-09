@@ -1,5 +1,7 @@
 #include <functional>
+#include <glm/glm.hpp>
 #include <vector>
+#include <iostream>
 
 #include "util/key.h"
 #include "util/scad.h"
@@ -8,9 +10,16 @@
 using namespace kb;
 
 const bool kIncludeConnectors = true;
-const bool kUseCapsuleConnector = false;
+const bool kUseCapsuleConnector = true;
 const bool kShowManuform = false;
 const bool kAddCaps = true;
+
+std::ostream &operator<< (std::ostream &out, const glm::vec3 &vec) {
+  out << "{" 
+    << vec.x << " " << vec.y << " "<< vec.z 
+    << "}";
+  return out;
+}
 
 Shape Connector() {
   return kUseCapsuleConnector ? GetCapsuleConnector() : GetPostConnector();
@@ -27,13 +36,17 @@ int main() {
   std::vector<Key*> keys;
 
   double extra_width = 4;
+  double extra_height = 4;
 
   double radius = 60;
   double rotation = 17;
   Key top_template;
   top_template.local_transforms.TranslateZ(-1 * radius).RotateX(rotation).TranslateZ(radius);
 
+  Key origin;
+
   auto configure_key = [&keys](Key* k, std::function<void(Key & k)> fn) {
+    k->extra_z = 1;
     fn(*k);
     keys.push_back(k);
   };
@@ -46,6 +59,7 @@ int main() {
   // Middle Finger - d
   Key m2{-3, 3, 28.5};
   configure_key(&m2, [&](Key& k) {
+    k.parent = &origin;
     k.t().ry = -15;
     k.AddTransform();
     k.t().x = -.3;
@@ -64,7 +78,7 @@ int main() {
   Key tt2 = top_template;
   configure_key(&tt2, [&](Key& k) {
     k.parent = &t2;
-    k.extra_height_top = 2;
+    k.extra_height_top = extra_height;
   });
 
   Key b2 = bottom_template;
@@ -78,7 +92,9 @@ int main() {
   configure_key(&bb2, [&](Key& k) {
     k.parent = &b2;
     k.extra_width_right = 2;
-    k.extra_height_bottom = 2;
+    k.extra_height_bottom = extra_height;
+    k.extra_width_left = 1;
+    k.extra_width_right = 1;
   });
 
   // Index Finger - f
@@ -103,14 +119,14 @@ int main() {
   configure_key(&tt1, [&](Key& k) {
     k.parent = &t1;
     k.extra_z = 3;
-    k.extra_height_top = 2;
+    k.extra_height_top = extra_height;
   });
 
   Key b1 = bottom_template;
   configure_key(&b1, [&](Key& k) {
     k.parent = &m1;
     k.extra_z = 2;
-    k.extra_height_bottom = 5;
+    k.extra_height_bottom = extra_height;
   });
 
   // Innermost Column - g
@@ -135,7 +151,7 @@ int main() {
   configure_key(&tt0, [&](Key& k) {
     k.parent = &t0;
     k.extra_width_right = extra_width;
-    k.extra_height_top = 2;
+    k.extra_height_top = extra_height;
   });
 
   Key b0 = bottom_template;
@@ -154,31 +170,35 @@ int main() {
     k.t().x = .2;
     k.t().z = .28;
     k.extra_z = 2;
+    k.extra_width_left = 2;
   });
 
   Key t3 = top_template;
   configure_key(&t3, [&](Key& k) {
     k.parent = &m3;
     k.extra_z = 2;
+    k.extra_width_left = 2;
   });
 
   Key tt3 = top_template;
   configure_key(&tt3, [&](Key& k) {
     k.parent = &t3;
     k.extra_z = 3;
-    k.extra_height_top = 2;
+    k.extra_height_top = extra_height;
+    k.extra_width_left = 2;
   });
 
   Key b3 = bottom_template;
   configure_key(&b3, [&](Key& k) {
     k.parent = &m3;
     k.extra_z = 2;
+    k.extra_width_left = 2;
   });
 
   Key bb3 = bottom_template;
   configure_key(&bb3, [&](Key& k) {
     k.parent = &b3;
-    k.extra_height_bottom = 2;
+    k.extra_height_bottom = extra_height;
   });
 
   // Pinky Finger - a
@@ -190,6 +210,7 @@ int main() {
     k.AddTransform();
     k.t().z = .2;
     k.t().y = -.45;
+    k.t().y -= 2;
     k.extra_z = 2;
   });
 
@@ -203,14 +224,15 @@ int main() {
   configure_key(&tt4, [&](Key& k) {
     k.parent = &t4;
     k.extra_z = 2;
-    k.extra_height_top = 4;
+    k.extra_height_top = extra_height;
   });
 
   Key b4 = bottom_template;
   configure_key(&b4, [&](Key& k) {
     k.parent = &m4;
     k.extra_z = 2;
-    k.extra_height_bottom = 4;
+    k.extra_height_bottom = extra_height;
+    k.extra_width_right = 1;
   });
 
   // Shift Column
@@ -233,7 +255,7 @@ int main() {
   configure_key(&tt5, [&](Key& k) {
     k.parent = &t5;
     k.extra_z = 2;
-    k.extra_height_top = 4;
+    k.extra_height_top = extra_height;
     k.extra_width_left = extra_width;
   });
 
@@ -241,7 +263,7 @@ int main() {
   configure_key(&b5, [&](Key& k) {
     k.parent = &m5;
     k.extra_z = 2;
-    k.extra_height_bottom = 4;
+    k.extra_height_bottom = extra_height;
     k.extra_width_left = extra_width;
   });
 
@@ -250,15 +272,17 @@ int main() {
   // Top Right
   Key th1{22.5, -54.1, 50.2};
   configure_key(&th1, [&](Key& k) {
+    k.parent = &origin;
     k.t().rx = 13.3;
     k.t().ry = 21.6;
     k.t().rz = -9;
     k.t().y -= 2;
     k.AddTransform();
     k.t().z = 1;
-    k.extra_height_top = 2;
-    k.extra_height_bottom = 4;
+    k.extra_height_top = 4;
+    k.extra_height_bottom = extra_height;
     k.extra_width_right = 1;
+    k.extra_width_left = 1;
     k.extra_z = 1;
   });
 
@@ -266,49 +290,30 @@ int main() {
   configure_key(&th2, [&](Key& k) {
     k.parent = &th1;
     k.extra_z = 1;
-    k.extra_height_bottom = 3;
-
-    /*
-    k.t().ry = -10;
-    k.AddTransform();
-    k.t().x -= 1;
-    k.t().z = 2;
-    */
+    k.extra_height_bottom = extra_height;
+    k.extra_width_right = 2;
   });
 
   Key th2_t{0, 20, 2.2};
   configure_key(&th2_t, [&](Key& k) {
     k.parent = &th2;
     k.extra_z = 2;
-
-    /*
-    k.t().rx = 5;
-    k.AddTransform();
-    k.t().y = -1;
-    k.t().z = 2;
-    */
+    k.extra_width_right = 2;
   });
 
-  Key th3{20, -8, 1.5};
+  Key th3{20, -12, 1.5};
   configure_key(&th3, [&](Key& k) {
     k.parent = &th2;
     k.extra_z = 2;
-    k.extra_height_bottom = 2;
+    k.extra_height_bottom = extra_height;
     k.extra_width_right = extra_width;
-
-    /*
-    k.t().ry = -10;
-    k.AddTransform();
-    k.t().x -= 1;
-    k.t().z = 2;
-    */
   });
 
   Key th3_t{0, 20, 4.2};
   configure_key(&th3_t, [&](Key& k) {
     k.parent = &th3;
     k.extra_z = 3.5;
-    k.extra_height_top = 4;
+    k.extra_height_top = extra_height;
     k.extra_width_right = extra_width;
   });
 
@@ -316,7 +321,7 @@ int main() {
   for (Key* key : keys) {
     shapes.push_back(key->GetSwitch());
     if (kAddCaps) {
-      shapes.push_back(key->GetCap().Color("red", .3));
+      shapes.push_back(key->GetCap().Color("red", .6));
     }
   }
 
@@ -483,6 +488,24 @@ int main() {
       return Hull(s, s.Projection().LinearExtrude(1));
     };
     for (size_t i = 0; i < wall_points.size(); ++i) {
+      /*
+    glm::vec3 up = {0, 0, 1};
+    std::vector<glm::vec3> points;
+      TransformList t1 = wall_points[i];
+      TransformList t2 = wall_points[(i + 1) % wall_points.size()];
+      glm::vec3 p0{0, 0, 0};
+      glm::vec3 p1 = t1.Apply(p0);
+      glm::vec3 p2 = t2.Apply(p0);
+      glm::vec3 diff = p2 - p1;
+      if (glm::length(diff) > 12) {
+        glm::vec3 mid_point = (diff / 2.f) + p1;
+        glm::vec3 out = glm::normalize(glm::cross(glm::normalize(diff), up));
+        glm::vec3 p = mid_point + (out * 5.f - glm::vec3(0, 0, 8));
+        Shape p_shape = TransformList().Translate(p).Apply(GetSphereConnector());
+        shapes.push_back(p_shape);
+      }
+      */
+
       shapes.push_back(
           Hull(get_post(wall_points[i]), get_post(wall_points[(i + 1) % wall_points.size()])));
     }

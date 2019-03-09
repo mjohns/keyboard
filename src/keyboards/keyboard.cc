@@ -9,10 +9,10 @@
 
 using namespace kb;
 
-const bool kIncludeConnectors = true;
+const bool kIncludeConnectors = false;
 const bool kUseCapsuleConnector = true;
 const bool kShowManuform = false;
-const bool kAddCaps = true;
+const bool kAddCaps = false;
 
 std::ostream& operator<<(std::ostream& out, const glm::vec3& vec) {
   out << "{" << vec.x << " " << vec.y << " " << vec.z << "}";
@@ -42,6 +42,7 @@ int main() {
   top_template.local_transforms.TranslateZ(-1 * radius).RotateX(rotation).TranslateZ(radius);
 
   Key origin;
+  origin.t().z = -5;
 
   auto configure_key = [&keys](Key* k, std::function<void(Key & k)> fn) {
     k->extra_z = 1;
@@ -71,12 +72,18 @@ int main() {
     k.parent = &m2;
     k.extra_width_left = 1;
     k.extra_width_right = 1;
+    k.AddTransform();
+    k.t().z = 1.5;
+    k.extra_z = 2;
   });
 
   Key tt2 = top_template;
   configure_key(&tt2, [&](Key& k) {
     k.parent = &t2;
     k.extra_height_top = extra_height;
+    k.AddTransform();
+    k.t().z = 4;
+    k.extra_z = 3.5;
   });
 
   Key b2 = bottom_template;
@@ -91,7 +98,7 @@ int main() {
     k.parent = &b2;
     k.extra_width_right = 2;
     k.extra_height_bottom = extra_height;
-    k.extra_width_left = 1;
+    k.extra_width_left = 2;
     k.extra_width_right = 1;
   });
 
@@ -118,6 +125,9 @@ int main() {
     k.parent = &t1;
     k.extra_z = 3;
     k.extra_height_top = extra_height;
+    k.AddTransform();
+    k.t().z = 3;
+    k.extra_z = 3;
   });
 
   Key b1 = bottom_template;
@@ -150,6 +160,9 @@ int main() {
     k.parent = &t0;
     k.extra_width_right = extra_width;
     k.extra_height_top = extra_height;
+    k.AddTransform();
+    k.t().z = 3.5;
+    k.extra_z = 3;
   });
 
   Key b0 = bottom_template;
@@ -184,6 +197,9 @@ int main() {
     k.extra_z = 3;
     k.extra_height_top = extra_height;
     k.extra_width_left = 2;
+    k.AddTransform();
+    k.t().z = 3;
+    k.extra_z = 3.5;
   });
 
   Key b3 = bottom_template;
@@ -191,13 +207,16 @@ int main() {
     k.parent = &m3;
     k.extra_z = 2;
     k.extra_width_left = 2;
+    k.extra_height_bottom = extra_height;
   });
 
+  /*
   Key bb3 = bottom_template;
   configure_key(&bb3, [&](Key& k) {
     k.parent = &b3;
     k.extra_height_bottom = extra_height;
   });
+  */
 
   // Pinky Finger - a
   Key m4{-20.2, -11.5, 6.3};
@@ -230,7 +249,7 @@ int main() {
     k.parent = &m4;
     k.extra_z = 2;
     k.extra_height_bottom = extra_height;
-    k.extra_width_right = 1;
+    k.extra_width_right = 2;
   });
 
   // Shift Column
@@ -290,6 +309,7 @@ int main() {
     k.extra_z = 1;
     k.extra_height_bottom = extra_height;
     k.extra_width_right = 2;
+    k.extra_height_top = 2;
   });
 
   Key th2_t{0, 20, 2.2};
@@ -304,6 +324,7 @@ int main() {
     k.parent = &th2;
     k.extra_z = 2;
     k.extra_height_bottom = extra_height;
+    k.extra_height_top = 2;
     k.extra_width_right = extra_width;
   });
 
@@ -347,7 +368,7 @@ int main() {
         ConnectHorizontal(tt2, tt1, Connector()),
         ConnectHorizontal(tt1, tt0, Connector()),
 
-        ConnectHorizontal(bb3, bb2, Connector()),
+        //ConnectHorizontal(bb3, bb2, Connector()),
 
         // Connect bottom row
         ConnectHorizontal(b5, b4, Connector()),
@@ -367,7 +388,7 @@ int main() {
         ConnectVertical(tt3, t3, Connector()),
         ConnectVertical(t3, m3, Connector()),
         ConnectVertical(m3, b3, Connector()),
-        ConnectVertical(b3, bb3, Connector()),
+        //ConnectVertical(b3, bb3, Connector()),
 
         ConnectVertical(tt2, t2, Connector()),
         ConnectVertical(t2, m2, Connector()),
@@ -400,10 +421,10 @@ int main() {
         ConnectDiagonal(m2, m1, b1, b2, Connector()),
         ConnectDiagonal(m1, m0, b0, b1, Connector()),
 
-        ConnectDiagonal(b3, b2, bb2, bb3, Connector()),
+        //ConnectDiagonal(b3, b2, bb2, bb3, Connector()),
 
-        Tri(bb3.GetTopLeft(), bb3.GetBottomLeft(), b4.GetBottomRight(), Connector()),
-        Tri(b3.GetBottomLeft(), bb3.GetTopLeft(), b4.GetBottomRight(), Connector()),
+        //Tri(bb3.GetTopLeft(), bb3.GetBottomLeft(), b4.GetBottomRight(), Connector()),
+        //Tri(b3.GetBottomLeft(), bb3.GetTopLeft(), b4.GetBottomRight(), Connector()),
 
         Tri(th2_t.GetTopLeft(), b0.GetBottomLeft(), b0.GetBottomRight(), Connector()),
         Tri(th2_t.GetTopLeft(), th2_t.GetTopRight(), b0.GetBottomRight(), Connector()),
@@ -459,8 +480,8 @@ int main() {
         b5.GetBottomRight(),
         b4.GetBottomLeft(),
         b4.GetBottomRight(),
-        bb3.GetBottomLeft(),
-        bb3.GetBottomRight(),
+        b3.GetBottomLeft(),
+        b3.GetBottomRight(),
         bb2.GetBottomLeft(),
         bb2.GetBottomRight(),
         th1.GetBottomLeft(),

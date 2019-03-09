@@ -230,7 +230,7 @@ int main() {
   });
 
   Key tt5 = top_template;
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&tt5, [&](Key& k) {
     k.parent = &t5;
     k.extra_z = 2;
     k.extra_height_top = 4;
@@ -238,7 +238,7 @@ int main() {
   });
 
   Key b5 = bottom_template;
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&b5, [&](Key& k) {
     k.parent = &m5;
     k.extra_z = 2;
     k.extra_height_bottom = 4;
@@ -249,7 +249,7 @@ int main() {
 
   // Top Right
   Key th1{22.5, -54.1, 50.2};
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&th1, [&](Key& k) {
     k.t().rx = 13.3;
     k.t().ry = 21.6;
     k.t().rz = -9;
@@ -263,7 +263,7 @@ int main() {
   });
 
   Key th2{20, -5, 3.2};
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&th2, [&](Key& k) {
     k.parent = &th1;
     k.extra_z = 1;
     k.extra_height_bottom = 3;
@@ -277,7 +277,7 @@ int main() {
   });
 
   Key th2_t{0, 20, 2.2};
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&th2_t, [&](Key& k) {
     k.parent = &th2;
     k.extra_z = 2;
 
@@ -290,7 +290,7 @@ int main() {
   });
 
   Key th3{20, -8, 1.5};
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&th3, [&](Key& k) {
     k.parent = &th2;
     k.extra_z = 2;
     k.extra_height_bottom = 2;
@@ -305,7 +305,7 @@ int main() {
   });
 
   Key th3_t{0, 20, 4.2};
-  configure_key(&t5, [&](Key& k) {
+  configure_key(&th3_t, [&](Key& k) {
     k.parent = &th3;
     k.extra_z = 3.5;
     k.extra_height_top = 4;
@@ -407,7 +407,7 @@ int main() {
 
         Tri(b1.GetBottomLeft(), bb2.GetTopRight(), b2.GetBottomRight(), Connector()),
 
-        // Thumb
+        // Thumb connectors
         ConnectHorizontal(th1, th2, Connector()),
         ConnectHorizontal(th2, th3, Connector()),
         ConnectHorizontal(th2_t, th3_t, Connector()),
@@ -422,8 +422,8 @@ int main() {
         ConnectVertical(b1, th1, Connector()),
         Tri(b1.GetBottomLeft(), bb2.GetBottomRight(), th1.GetTopLeft(), Connector()),
         Tri(th1.GetBottomLeft(), bb2.GetBottomRight(), th1.GetTopLeft(), Connector()),
-        Tri(bb3.GetBottomRight(), bb2.GetBottomLeft(), bb2.GetBottomRight(), Connector()),
-        Tri(bb3.GetBottomRight(), th1.GetBottomLeft(), bb2.GetBottomRight(), Connector()),
+        // Tri(bb3.GetBottomRight(), bb2.GetBottomLeft(), bb2.GetBottomRight(), Connector()),
+        // Tri(bb3.GetBottomRight(), th1.GetBottomLeft(), bb2.GetBottomRight(), Connector()),
         Tri(th2_t.GetTopRight(), b0.GetBottomRight(), b0.GetTopRight(), Connector()),
         Tri(th2_t.GetTopRight(), th3_t.GetTopLeft(), th3_t.GetTopRight(), Connector()),
         // Tri(th2_t.GetTopRight(), th3_t.GetTopRight(), b0.GetTopRight(), Connector()),
@@ -432,18 +432,52 @@ int main() {
 
     shapes.insert(shapes.end(), connectors.begin(), connectors.end());
 
+    // clang-format off
     std::vector<TransformList> wall_points = {
-        tt0.GetTopRight(),   tt0.GetTopLeft(),     tt1.GetTopRight(),   tt1.GetTopLeft(),
-        tt2.GetTopRight(),   tt2.GetTopLeft(),     tt3.GetTopRight(),   tt3.GetTopLeft(),
-        tt4.GetTopRight(),   tt4.GetTopLeft(),     tt5.GetTopRight(),   tt5.GetTopLeft(),
-        tt5.GetBottomLeft(), t5.GetTopLeft(),      t5.GetBottomLeft(),  m5.GetTopLeft(),
-        m5.GetBottomLeft(),  b5.GetTopLeft(),      b5.GetBottomLeft(),  b5.GetBottomRight(),
-        b4.GetBottomLeft(),  b4.GetBottomRight(),  bb3.GetBottomLeft(), bb3.GetBottomRight(),
-        th1.GetBottomLeft(), th1.GetBottomRight(), th2.GetBottomLeft(), th2.GetBottomRight(),
-        th3.GetBottomLeft(), th3.GetBottomRight(), th3.GetTopRight(),   th3_t.GetBottomRight(),
-        th3_t.GetTopRight(), th2_t.GetTopRight(),  b0.GetTopRight(),    m0.GetBottomRight(),
-        m0.GetTopRight(),    t0.GetBottomRight(),  t0.GetTopRight(),    tt0.GetBottomRight(),
+        tt0.GetTopRight(),
+        tt0.GetTopLeft(),
+        tt1.GetTopRight(),
+        tt1.GetTopLeft(),
+        tt2.GetTopRight(),
+        tt2.GetTopLeft(),
+        tt3.GetTopRight(),
+        tt3.GetTopLeft(),
+        tt4.GetTopRight(),
+        tt4.GetTopLeft(),
+        tt5.GetTopRight(),
+        tt5.GetTopLeft(),
+        tt5.GetBottomLeft(),
+        t5.GetTopLeft(),
+        t5.GetBottomLeft(),
+        m5.GetTopLeft(),
+        m5.GetBottomLeft(),
+        b5.GetTopLeft(),
+        b5.GetBottomLeft(),
+        b5.GetBottomRight(),
+        b4.GetBottomLeft(),
+        b4.GetBottomRight(),
+        bb3.GetBottomLeft(),
+        bb3.GetBottomRight(),
+        bb2.GetBottomLeft(),
+        bb2.GetBottomRight(),
+        th1.GetBottomLeft(),
+        th1.GetBottomRight(),
+        th2.GetBottomLeft(),
+        th2.GetBottomRight(),
+        th3.GetBottomLeft(),
+        th3.GetBottomRight(),
+        th3.GetTopRight(),
+        th3_t.GetBottomRight(),
+        th3_t.GetTopRight(),
+        th2_t.GetTopRight(),
+        b0.GetTopRight(),
+        m0.GetBottomRight(),
+        m0.GetTopRight(),
+        t0.GetBottomRight(),
+        t0.GetTopRight(),
+        tt0.GetBottomRight(),
     };
+    // clang-format on
     auto get_post = [](TransformList t) {
       Shape s = t.Apply(Connector());
       return Hull(s, s.Projection().LinearExtrude(1));

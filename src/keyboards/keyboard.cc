@@ -9,10 +9,11 @@
 
 using namespace kb;
 
-const bool kIncludeConnectors = false;
+const bool kIncludeConnectors = true;
 const bool kUseCapsuleConnector = true;
 const bool kShowManuform = false;
 const bool kAddCaps = false;
+const glm::vec3 kOrigin(0, 0, 0);
 
 std::ostream& operator<<(std::ostream& out, const glm::vec3& vec) {
   out << "{" << vec.x << " " << vec.y << " " << vec.z << "}";
@@ -28,6 +29,13 @@ Shape Tri(const TransformList& t1,
           const TransformList& t3,
           Shape connector) {
   return Hull(t1.Apply(connector), t2.Apply(connector), t3.Apply(connector));
+}
+
+glm::vec3 MidPoint(const TransformList& t1, const TransformList& t2) {
+  glm::vec3 p1 = t1.Apply(kOrigin);
+  glm::vec3 p2 = t2.Apply(kOrigin);
+  glm::vec3 diff = p2 - p1;
+  return (diff / 2.f) + p1;
 }
 
 int main() {
@@ -368,7 +376,7 @@ int main() {
         ConnectHorizontal(tt2, tt1, Connector()),
         ConnectHorizontal(tt1, tt0, Connector()),
 
-        //ConnectHorizontal(bb3, bb2, Connector()),
+        // ConnectHorizontal(bb3, bb2, Connector()),
 
         // Connect bottom row
         ConnectHorizontal(b5, b4, Connector()),
@@ -388,7 +396,7 @@ int main() {
         ConnectVertical(tt3, t3, Connector()),
         ConnectVertical(t3, m3, Connector()),
         ConnectVertical(m3, b3, Connector()),
-        //ConnectVertical(b3, bb3, Connector()),
+        // ConnectVertical(b3, bb3, Connector()),
 
         ConnectVertical(tt2, t2, Connector()),
         ConnectVertical(t2, m2, Connector()),
@@ -421,10 +429,10 @@ int main() {
         ConnectDiagonal(m2, m1, b1, b2, Connector()),
         ConnectDiagonal(m1, m0, b0, b1, Connector()),
 
-        //ConnectDiagonal(b3, b2, bb2, bb3, Connector()),
+        // ConnectDiagonal(b3, b2, bb2, bb3, Connector()),
 
-        //Tri(bb3.GetTopLeft(), bb3.GetBottomLeft(), b4.GetBottomRight(), Connector()),
-        //Tri(b3.GetBottomLeft(), bb3.GetTopLeft(), b4.GetBottomRight(), Connector()),
+        // Tri(bb3.GetTopLeft(), bb3.GetBottomLeft(), b4.GetBottomRight(), Connector()),
+        // Tri(b3.GetBottomLeft(), bb3.GetTopLeft(), b4.GetBottomRight(), Connector()),
 
         Tri(th2_t.GetTopLeft(), b0.GetBottomLeft(), b0.GetBottomRight(), Connector()),
         Tri(th2_t.GetTopLeft(), th2_t.GetTopRight(), b0.GetBottomRight(), Connector()),
@@ -534,7 +542,13 @@ int main() {
     shapes.push_back(Import("left.stl").Color("green", .3));
   }
 
-  UnionAll(shapes).WriteToFile("simple.scad");
+  Shape c = Cylinder(10, 1, 30).RotateX(90);
+  Shape connector_punch = Cube(6, 10, 6).Add(Hull(c, c.TranslateZ(-2)).TranslateZ(-2));
+
+  glm::vec3 connector_pos = MidPoint(tt1.GetTopLeft(), tt1.GetTopRight());
+  connector_pos.z = 10;
+
+  UnionAll(shapes).Subtract(connector_punch.Translate(connector_pos)).WriteToFile("simple.scad");
 }
 
 /*

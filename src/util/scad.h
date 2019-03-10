@@ -20,12 +20,6 @@ struct LinearExtrudeParams {
   bool center = true;
 };
 
-struct Vec3 {
-  double x = 0;
-  double y = 0;
-  double z = 0;
-};
-
 class Shape {
  public:
   Shape() {
@@ -42,10 +36,12 @@ class Shape {
   Shape TranslateX(double x) const KB_WARN_UNUSED_RESULT;
   Shape TranslateY(double y) const KB_WARN_UNUSED_RESULT;
   Shape TranslateZ(double z) const KB_WARN_UNUSED_RESULT;
-  Shape Translate(const Vec3& v) const KB_WARN_UNUSED_RESULT;
+  template <typename Vec3>
+  Shape Translate(const Vec3& v) const KB_WARN_UNUSED_RESULT {
+    return Translate(v.x, v.y, v.z);
+  }
 
   Shape Mirror(double x, double y, double z) const KB_WARN_UNUSED_RESULT;
-  Shape Mirror(const Vec3& v) const KB_WARN_UNUSED_RESULT;
 
   Shape Rotate(double degrees, double x, double y, double z) const KB_WARN_UNUSED_RESULT;
   Shape RotateX(double degrees) const KB_WARN_UNUSED_RESULT;

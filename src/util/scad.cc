@@ -221,17 +221,9 @@ Shape Shape::TranslateZ(double z) const {
   return Translate(0, 0, z);
 }
 
-Shape Shape::Translate(const Vec3& v) const {
-  return Translate(v.x, v.y, v.z);
-}
-
 Shape Shape::Mirror(double x, double y, double z) const {
   auto write_name = [=](std::FILE* file) { fprintf(file, "mirror ([%.3f, %.3f, %.3f])", x, y, z); };
   return MakeComposite(write_name, {*this});
-}
-
-Shape Shape::Mirror(const Vec3& v) const {
-  return Mirror(v.x, v.y, v.z);
 }
 
 Shape Shape::Rotate(double degrees, double x, double y, double z) const {

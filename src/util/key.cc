@@ -181,10 +181,14 @@ TransformList Key::GetBottomLeftInternal() const {
 }
 
 Shape GetCapsuleConnector() {
+  Shape s = Cube(2, 2, kSwitchThickness);
+  return s.TranslateZ(kSwitchThickness / -2);
+  /*
   SphereParams params;
   params.r = 1;
-  params.fn = 30;
+  params.fn = 20;
   return Hull(Sphere(params).TranslateZ(-1), Sphere(params).TranslateZ(-3));
+  */
 }
 
 Shape GetSphereConnector() {

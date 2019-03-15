@@ -82,6 +82,7 @@ int main() {
     k.extra_width_right = 1;
     k.AddTransform();
     k.t().z = 1.5;
+    k.t().z += .6;
     k.extra_z = 2;
   });
 
@@ -89,6 +90,9 @@ int main() {
   configure_key(&tt2, [&](Key& k) {
     k.parent = &t2;
     k.extra_height_top = extra_height;
+    k.extra_width_left = 1;
+    k.extra_width_right = 1;
+
     k.AddTransform();
     k.t().z = 4;
     k.extra_z = 3.5;
@@ -126,16 +130,17 @@ int main() {
   configure_key(&t1, [&](Key& k) {
     k.parent = &m1;
     k.extra_z = 2;
+    k.t().z += .4;
   });
 
   Key tt1 = top_template;
   configure_key(&tt1, [&](Key& k) {
     k.parent = &t1;
-    k.extra_z = 3;
     k.extra_height_top = extra_height;
+
     k.AddTransform();
     k.t().z = 3;
-    k.extra_z = 3;
+    k.extra_z = 3.3;
   });
 
   Key b1 = bottom_template;
@@ -160,6 +165,7 @@ int main() {
   Key t0 = top_template;
   configure_key(&t0, [&](Key& k) {
     k.parent = &m0;
+    k.t().z += .4;
     k.extra_width_right = extra_width;
   });
 
@@ -171,12 +177,14 @@ int main() {
     k.AddTransform();
     k.t().z = 3.5;
     k.extra_z = 3;
+    k.t().z += 1;
   });
 
   Key b0 = bottom_template;
   configure_key(&b0, [&](Key& k) {
     k.parent = &m0;
     k.extra_z = 2;
+    k.t().z -= .4;
     k.extra_width_right = extra_width;
   });
 
@@ -197,6 +205,7 @@ int main() {
     k.parent = &m3;
     k.extra_z = 2;
     k.extra_width_left = 2;
+    k.t().z += .4;
   });
 
   Key tt3 = top_template;
@@ -207,7 +216,7 @@ int main() {
     k.extra_width_left = 2;
     k.AddTransform();
     k.t().z = 3;
-    k.extra_z = 3.5;
+    k.extra_z = 3.6;
   });
 
   Key b3 = bottom_template;
@@ -290,6 +299,7 @@ int main() {
     k.extra_z = 2;
     k.extra_height_bottom = extra_height;
     k.extra_width_left = extra_width;
+    k.t().z -= .2;
   });
 
   // Thumb
@@ -320,14 +330,14 @@ int main() {
     k.extra_height_top = 2;
   });
 
-  Key th2_t{0, 20, 2.2};
+  Key th2_t{0, 20, 2.9};
   configure_key(&th2_t, [&](Key& k) {
     k.parent = &th2;
     k.extra_z = 2;
     k.extra_width_right = 2;
   });
 
-  Key th3{20, -12, 1.5};
+  Key th3{20, -10, 1.5};
   configure_key(&th3, [&](Key& k) {
     k.parent = &th2;
     k.extra_z = 2;
@@ -542,8 +552,8 @@ int main() {
     shapes.push_back(Import("left.stl").Color("green", .3));
   }
 
-  Shape c = Cylinder(10, 1, 30).RotateX(90);
-  Shape connector_punch = Cube(6, 10, 6).Add(Hull(c, c.TranslateZ(-2)).TranslateZ(-2));
+  Shape c = Cylinder(10, 1.5, 30).RotateX(90);
+  Shape connector_punch = Cube(6, 10, 7).Add(Hull(c, c.TranslateZ(-2)).TranslateZ(-3));
 
   glm::vec3 connector_pos = MidPoint(tt1.GetTopLeft(), tt1.GetTopRight());
   connector_pos.z = 10;

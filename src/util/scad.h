@@ -5,11 +5,37 @@
 #include <string>
 #include <vector>
 
-#include "util/util.h"
+#if defined(__GNUC__) || defined(__GNUG__)
+#define SCAD_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#else
+#define SCAD_WARN_UNUSED_RESULT
+#endif
 
-namespace kb {
+namespace scad {
 
 using ScadWriter = std::function<void(std::FILE* file, int indent_level)>;
+
+template <typename T>
+class Optional {
+ public:
+  Optional() {
+  }
+
+  Optional(T value) : value_(value), has_value_(true) {
+  }
+
+  T value() const {
+    return value_;
+  }
+
+  bool has_value() const {
+    return has_value_;
+  }
+
+ private:
+  T value_;
+  bool has_value_ = false;
+};
 
 struct LinearExtrudeParams {
   double height = 0;
@@ -32,46 +58,52 @@ class Shape {
   void WriteToFile(const std::string& file_name) const;
   void AppendScad(std::FILE* file, int indent_level) const;
 
-  Shape Translate(double x, double y, double z) const KB_WARN_UNUSED_RESULT;
-  Shape TranslateX(double x) const KB_WARN_UNUSED_RESULT;
-  Shape TranslateY(double y) const KB_WARN_UNUSED_RESULT;
-  Shape TranslateZ(double z) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Translate(double x, double y, double z) const;
+  Shape SCAD_WARN_UNUSED_RESULT TranslateX(double x) const;
+  Shape SCAD_WARN_UNUSED_RESULT TranslateY(double y) const;
+  Shape SCAD_WARN_UNUSED_RESULT TranslateZ(double z) const;
   template <typename Vec3>
-  Shape Translate(const Vec3& v) const KB_WARN_UNUSED_RESULT {
+  Shape SCAD_WARN_UNUSED_RESULT Translate(const Vec3& v) const {
     return Translate(v.x, v.y, v.z);
   }
 
-  Shape Mirror(double x, double y, double z) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Mirror(double x, double y, double z) const;
+  Shape SCAD_WARN_UNUSED_RESULT MirrorY() const {
+    return Mirror(0, 1, 0);
+  }
+  Shape SCAD_WARN_UNUSED_RESULT MirrorX() const {
+    return Mirror(1, 0, 0);
+  }
 
-  Shape Rotate(double degrees, double x, double y, double z) const KB_WARN_UNUSED_RESULT;
-  Shape RotateX(double degrees) const KB_WARN_UNUSED_RESULT;
-  Shape RotateY(double degrees) const KB_WARN_UNUSED_RESULT;
-  Shape RotateZ(double degrees) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Rotate(double degrees, double x, double y, double z) const;
+  Shape SCAD_WARN_UNUSED_RESULT RotateX(double degrees) const;
+  Shape SCAD_WARN_UNUSED_RESULT RotateY(double degrees) const;
+  Shape SCAD_WARN_UNUSED_RESULT RotateZ(double degrees) const;
 
-  Shape LinearExtrude(const LinearExtrudeParams& params) const KB_WARN_UNUSED_RESULT;
-  Shape LinearExtrude(double height) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT LinearExtrude(const LinearExtrudeParams& params) const;
+  Shape SCAD_WARN_UNUSED_RESULT LinearExtrude(double height) const;
 
-  Shape Color(double r, double g, double b, double a = 1.0) const KB_WARN_UNUSED_RESULT;
-  Shape Color(const std::string& color, double a = 1) const KB_WARN_UNUSED_RESULT;
-  Shape Alpha(double a) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Color(double r, double g, double b, double a = 1.0) const;
+  Shape SCAD_WARN_UNUSED_RESULT Color(const std::string& color, double a = 1) const;
+  Shape SCAD_WARN_UNUSED_RESULT Alpha(double a) const;
 
-  Shape Subtract(const Shape& other) const KB_WARN_UNUSED_RESULT;
-  Shape operator-(const Shape& other) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Subtract(const Shape& other) const;
+  Shape operator-(const Shape& other) const;
   Shape& operator-=(const Shape& other);
 
-  Shape Add(const Shape& other) const KB_WARN_UNUSED_RESULT;
-  Shape operator+(const Shape& other) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Add(const Shape& other) const;
+  Shape operator+(const Shape& other) const;
   Shape& operator+=(const Shape& other);
 
-  Shape Scale(double x, double y, double z) const KB_WARN_UNUSED_RESULT;
-  Shape Scale(double s) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Scale(double x, double y, double z) const;
+  Shape SCAD_WARN_UNUSED_RESULT Scale(double s) const;
 
-  Shape OffsetRadius(double r, bool chamfer = false) const KB_WARN_UNUSED_RESULT;
-  Shape OffsetDelta(double delta, bool chamfer = false) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT OffsetRadius(double r, bool chamfer = false) const;
+  Shape SCAD_WARN_UNUSED_RESULT OffsetDelta(double delta, bool chamfer = false) const;
 
-  Shape Comment(const std::string& comment) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Comment(const std::string& comment) const;
 
-  Shape Projection(bool cut = false) const KB_WARN_UNUSED_RESULT;
+  Shape SCAD_WARN_UNUSED_RESULT Projection(bool cut = false) const;
 
  private:
   std::shared_ptr<const ScadWriter> scad_;
@@ -83,9 +115,9 @@ struct CubeParams {
   double z = 1;
   bool center = true;
 };
-Shape Cube(const CubeParams& params) KB_WARN_UNUSED_RESULT;
-Shape Cube(double x, double y, double z, bool center = true) KB_WARN_UNUSED_RESULT;
-Shape Cube(double size, bool center = true) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Cube(const CubeParams& params);
+Shape SCAD_WARN_UNUSED_RESULT Cube(double x, double y, double z, bool center = true);
+Shape SCAD_WARN_UNUSED_RESULT Cube(double size, bool center = true);
 
 struct SphereParams {
   double r = 1;
@@ -93,8 +125,8 @@ struct SphereParams {
   Optional<double> fa;
   Optional<double> fs;
 };
-Shape Sphere(const SphereParams& params) KB_WARN_UNUSED_RESULT;
-Shape Sphere(double radius) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Sphere(const SphereParams& params);
+Shape SCAD_WARN_UNUSED_RESULT Sphere(double radius);
 
 struct CircleParams {
   double r = 1;
@@ -102,8 +134,8 @@ struct CircleParams {
   Optional<double> fa;
   Optional<double> fs;
 };
-Shape Circle(const CircleParams& params) KB_WARN_UNUSED_RESULT;
-Shape Circle(double radius) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Circle(const CircleParams& params);
+Shape SCAD_WARN_UNUSED_RESULT Circle(double radius);
 
 struct CylinderParams {
   double h = 1;
@@ -112,54 +144,54 @@ struct CylinderParams {
   Optional<double> fn;
   bool center = true;
 };
-Shape Cylinder(const CylinderParams& params) KB_WARN_UNUSED_RESULT;
-Shape Cylinder(double height, double radius, Optional<double> fn = {}) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Cylinder(const CylinderParams& params);
+Shape SCAD_WARN_UNUSED_RESULT Cylinder(double height, double radius, Optional<double> fn = {});
 
 struct SquareParams {
   double x = 1;
   double y = 1;
   bool center = true;
 };
-Shape Square(const CubeParams& params) KB_WARN_UNUSED_RESULT;
-Shape Square(double x, double y, bool center = true) KB_WARN_UNUSED_RESULT;
-Shape Square(double size, bool center = true) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Square(const CubeParams& params);
+Shape SCAD_WARN_UNUSED_RESULT Square(double x, double y, bool center = true);
+Shape SCAD_WARN_UNUSED_RESULT Square(double size, bool center = true);
 
 struct Point2d {
   double x = 0;
   double y = 0;
 };
-Shape Polygon(const std::vector<Point2d>& points) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Polygon(const std::vector<Point2d>& points);
 
-Shape HullAll(const std::vector<Shape>& shapes) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT HullAll(const std::vector<Shape>& shapes);
 
 template <typename... Shapes>
-Shape Hull(const Shape& shape, const Shapes&... more_shapes) {
+Shape SCAD_WARN_UNUSED_RESULT Hull(const Shape& shape, const Shapes&... more_shapes) {
   return HullAll({shape, more_shapes...});
 }
 
-Shape UnionAll(const std::vector<Shape>& shapes) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT UnionAll(const std::vector<Shape>& shapes);
 
 template <typename... Shapes>
-Shape Union(const Shape& shape, const Shapes&... more_shapes) {
+Shape SCAD_WARN_UNUSED_RESULT Union(const Shape& shape, const Shapes&... more_shapes) {
   return UnionAll({shape, more_shapes...});
 }
 
-Shape DifferenceAll(const std::vector<Shape>& shapes) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT DifferenceAll(const std::vector<Shape>& shapes);
 
 template <typename... Shapes>
-Shape Difference(const Shape& shape, const Shapes&... more_shapes) {
+Shape SCAD_WARN_UNUSED_RESULT Difference(const Shape& shape, const Shapes&... more_shapes) {
   return DifferenceAll({shape, more_shapes...});
 }
 
-Shape IntersectionAll(const std::vector<Shape>& shapes) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT IntersectionAll(const std::vector<Shape>& shapes);
 
 template <typename... Shapes>
-Shape Intersection(const Shape& shape, const Shapes&... more_shapes) {
+Shape SCAD_WARN_UNUSED_RESULT Intersection(const Shape& shape, const Shapes&... more_shapes) {
   return IntersectionAll({shape, more_shapes...});
 }
 
-Shape Import(const std::string& file_name, int convexity = -1) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Import(const std::string& file_name, int convexity = -1);
 
-Shape Minkowski(const Shape& first, const Shape& second) KB_WARN_UNUSED_RESULT;
+Shape SCAD_WARN_UNUSED_RESULT Minkowski(const Shape& first, const Shape& second);
 
-}  // namespace kb
+}  // namespace scad

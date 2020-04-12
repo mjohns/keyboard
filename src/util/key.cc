@@ -1,13 +1,13 @@
-#include "util/key.h"
+#include "key.h"
 
 #include <cassert>
 #include <memory>
 #include <unordered_set>
 
-#include "util/scad.h"
-#include "util/transform.h"
+#include "scad.h"
+#include "transform.h"
 
-namespace kb {
+namespace scad {
 namespace {
 
 Shape MakeSwitch(bool add_side_nub) {
@@ -66,28 +66,42 @@ Shape MakeDsaCap() {
 
 }  // namespace
 
+Key& Key::SetPosition(double x, double y, double z) {
+  t().x = x;
+  t().y = y;
+  t().z = z;
+  return *this;
+}
+
+Key& Key::SetParent(const Key& key) {
+  parent_transforms = key.GetTransforms();
+  return *this;
+}
+
+Key& Key::SetParent(const TransformList& transforms) {
+  parent_transforms = transforms;
+  return *this;
+}
+
 TransformList Key::GetTransforms() const {
-  Key* key = parent;
-  std::vector<const Key*> keys;
-  keys.push_back(this);
-  std::unordered_set<Key*> visited;
-  while (key != nullptr) {
-    bool inserted = visited.insert(key).second;
-    assert(inserted && "found cycle in parents");
-    keys.push_back(key);
-    key = key->parent;
-  }
   TransformList transforms;
-  for (auto it = keys.begin(); it != keys.end(); ++it) {
-    transforms.Append((*it)->local_transforms);
-  }
+  transforms.Append(local_transforms);
+  transforms.Append(parent_transforms);
   return transforms;
 }
 
 TransformList Key::GetSwitchTransforms() const {
+  if (!use_switch_offset) {
+    return GetTransforms();
+  }
   TransformList transforms;
   transforms.AddTransform().z = -1 * kDsaHeight - 6.4 - extra_z;
   return transforms.Append(GetTransforms());
+}
+
+Shape Key::GetInverseSwitch() const {
+  Shape s = GetSwitch();
+  return Hull(s).Subtract(s);
 }
 
 Shape Key::GetSwitch() const {
@@ -233,4 +247,11 @@ Shape ConnectDiagonal(const Key& top_left,
                     top_left.GetBottomRight().Apply(connector)));
 }
 
-}  // namespace kb
+Shape Tri(const TransformList& t1,
+          const TransformList& t2,
+          const TransformList& t3,
+          Shape connector) {
+  return Hull(t1.Apply(connector), t2.Apply(connector), t3.Apply(connector));
+}
+
+}  // namespace scad

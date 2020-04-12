@@ -3,9 +3,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "util/scad.h"
+#include "scad.h"
 
-namespace kb {
+namespace scad {
 
 struct Transform {
  public:
@@ -131,4 +131,4 @@ class TransformList {
   std::vector<Transform> transforms_;
 };
 
-}  // namespace kb
+}  // namespace scad

@@ -91,11 +91,8 @@ TransformList Key::GetTransforms() const {
 }
 
 TransformList Key::GetSwitchTransforms() const {
-  if (!use_switch_offset) {
-    return GetTransforms();
-  }
   TransformList transforms;
-  transforms.AddTransform().z = -1 * kDsaHeight - 6.4 - extra_z;
+  transforms.AddTransform().z = -1 * switch_offset - extra_z;
   return transforms.Append(GetTransforms());
 }
 

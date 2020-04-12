@@ -42,8 +42,8 @@ struct Key {
   double extra_height_bottom = 0;
   double extra_width_left = 0;
   double extra_width_right = 0;
-  // This will move the key up by the specified amount while leaving the corner connectors further
-  // down.
+  // This makes the switch taller (moves the connectors down and increases wall height) while
+  // leaving the top plate at the same point.
   double extra_z = 0;
 
   bool add_side_nub = true;

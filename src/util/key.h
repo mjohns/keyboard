@@ -18,7 +18,7 @@ const double kDsaTopSize = 13.2;     // 0.5 * kMmPerInch;
 const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
 const double kDsaHalfSize = 16.2;
 
-const double kSwitchOffset = kSwitchWidth / 2 + kWallWidth;
+const double kSwitchHorizontalOffset = kSwitchWidth / 2 + kWallWidth;
 
 Shape GetCapsuleConnector();
 Shape GetSphereConnector();
@@ -42,12 +42,14 @@ struct Key {
   double extra_height_bottom = 0;
   double extra_width_left = 0;
   double extra_width_right = 0;
+  // This will move the key up by the specified amount while leaving the corner connectors further
+  // down.
   double extra_z = 0;
 
   bool add_side_nub = true;
   // The distance back that the switch should be placed. By default the origin is at the top of the
   // dsa key cap.
-  double switch_offset = kDsaHeight + 6.4;
+  double switch_z_offset = kDsaHeight + 6.4;
 
   Key& SetPosition(double x, double y, double z);
   Key& SetParent(const Key& key);

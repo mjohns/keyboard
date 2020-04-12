@@ -47,6 +47,7 @@ Shape MakeLiteralComposite(const char* name, const std::vector<Shape>& shapes) {
   });
 }
 
+// A primitive does not have any children. These are things like cubes, spheres, etc.
 Shape MakePrimitive(const std::function<void(std::FILE*)>& scad_writer) {
   return Shape([=](std::FILE* file, int indent_level) {
     WriteIndent(file, indent_level);

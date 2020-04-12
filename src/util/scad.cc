@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace kb {
+namespace scad {
 namespace {
 
 const int kTabSize = 2;
@@ -43,8 +43,7 @@ Shape MakeComposite(const std::function<void(std::FILE*)>& write_name,
 
 Shape MakeLiteralComposite(const char* name, const std::vector<Shape>& shapes) {
   return Shape([=](std::FILE* file, int indent_level) {
-    WriteComposite(
-        file, [=](std::FILE*) { fprintf(file, "%s", name); }, shapes, indent_level);
+    WriteComposite(file, [=](std::FILE*) { fprintf(file, "%s", name); }, shapes, indent_level);
   });
 }
 
@@ -377,4 +376,4 @@ Shape Minkowski(const Shape& first, const Shape& second) {
   return MakeLiteralComposite("minkowski ()", {first, second});
 }
 
-}  // namespace kb
+}  // namespace scad

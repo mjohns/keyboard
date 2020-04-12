@@ -1,12 +1,12 @@
-#include "util/transform.h"
+#include "transform.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-#include "util/scad.h"
+#include "scad.h"
 
-namespace kb {
+namespace scad {
 
 glm::vec3 Transform::Apply(const glm::vec3& p) const {
   glm::mat4 transform(1.0f);
@@ -35,4 +35,4 @@ glm::vec3 TransformList::Apply(const glm::vec3& in) const {
   return point;
 }
 
-}  // namespace kb
+}  // namespace scad

@@ -3,10 +3,10 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-#include "util/scad.h"
-#include "util/transform.h"
+#include "scad.h"
+#include "transform.h"
 
-namespace kb {
+namespace scad {
 
 // All sizes in mm.
 const double kSwitchWidth = 14.4;
@@ -35,8 +35,8 @@ struct Key {
     t().z = z;
   }
 
+  TransformList parent_transforms;
   TransformList local_transforms;
-  Key* parent = nullptr;
 
   double extra_height_top = 0;
   double extra_height_bottom = 0;
@@ -45,6 +45,11 @@ struct Key {
   double extra_z = 0;
 
   bool add_side_nub = true;
+	bool use_switch_offset = true;
+
+  Key& SetPosition(double x, double y, double z);
+  Key& SetParent(const Key& key);
+  Key& SetParent(const TransformList& transforms);
 
   Transform& t() {
     return local_transforms.mutable_front();
@@ -58,6 +63,7 @@ struct Key {
   TransformList GetSwitchTransforms() const;
 
   Shape GetSwitch() const;
+  Shape GetInverseSwitch() const;
   Shape GetCap() const;
 
   TransformList GetTopRight() const;
@@ -79,5 +85,9 @@ Shape ConnectDiagonal(const Key& top_left,
                       const Key& bottom_right,
                       const Key& bottom_left,
                       Shape connector = GetPostConnector());
+Shape Tri(const TransformList& t1,
+          const TransformList& t2,
+          const TransformList& t3,
+          Shape connector = GetPostConnector());
 
-}  // namespace kb
+}  // namespace scad

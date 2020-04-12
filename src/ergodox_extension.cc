@@ -128,7 +128,7 @@ int main() {
   std::vector<Shape> switch_shapes;
   std::vector<Shape> key_holes;
   for (Key* key : keys) {
-    key->switch_offset = 0;
+    key->switch_z_offset = 0;
     switch_shapes.push_back(key->GetSwitch());
     key_holes.push_back(key->GetInverseSwitch());
   }

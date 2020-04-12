@@ -92,7 +92,7 @@ TransformList Key::GetTransforms() const {
 
 TransformList Key::GetSwitchTransforms() const {
   TransformList transforms;
-  transforms.AddTransform().z = -1 * switch_offset - extra_z;
+  transforms.AddTransform().z = -1 * switch_z_offset - extra_z;
   return transforms.Append(GetTransforms());
 }
 
@@ -151,7 +151,7 @@ TransformList Key::GetTopRight() const {
 
 TransformList Key::GetTopRightInternal() const {
   TransformList transforms;
-  transforms.AddTransform({kSwitchOffset, kSwitchOffset, 0});
+  transforms.AddTransform({kSwitchHorizontalOffset, kSwitchHorizontalOffset, 0});
   return transforms.Append(GetSwitchTransforms());
 }
 
@@ -163,7 +163,7 @@ TransformList Key::GetTopLeft() const {
 
 TransformList Key::GetTopLeftInternal() const {
   TransformList transforms;
-  transforms.AddTransform({-1 * kSwitchOffset, kSwitchOffset, 0});
+  transforms.AddTransform({-1 * kSwitchHorizontalOffset, kSwitchHorizontalOffset, 0});
   return transforms.Append(GetSwitchTransforms());
 }
 
@@ -175,7 +175,7 @@ TransformList Key::GetBottomRight() const {
 
 TransformList Key::GetBottomRightInternal() const {
   TransformList transforms;
-  transforms.AddTransform({kSwitchOffset, -1 * kSwitchOffset, 0});
+  transforms.AddTransform({kSwitchHorizontalOffset, -1 * kSwitchHorizontalOffset, 0});
   return transforms.Append(GetSwitchTransforms());
 }
 
@@ -187,7 +187,7 @@ TransformList Key::GetBottomLeft() const {
 
 TransformList Key::GetBottomLeftInternal() const {
   TransformList transforms;
-  transforms.AddTransform({-1 * kSwitchOffset, -1 * kSwitchOffset, 0});
+  transforms.AddTransform({-1 * kSwitchHorizontalOffset, -1 * kSwitchHorizontalOffset, 0});
   return transforms.Append(GetSwitchTransforms());
 }
 

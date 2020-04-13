@@ -4,8 +4,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+CMD=openscad
+MAC_CMD=/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD
+if [ -f $MAC_CMD ]; then
+  CMD=$MAC_CMD
+fi
+
 echo "Generating STL"
-openscad -o things/ergodox_extension_left.stl out/ergodox_extension_left.scad
+$CMD -o things/ergodox_extension_left.stl out/ergodox_extension_left.scad
 
 echo "Generating right STL"
-openscad -o things/ergodox_extension_right.stl out/ergodox_extension_right.scad
+$CMD -o things/ergodox_extension_right.stl out/ergodox_extension_right.scad

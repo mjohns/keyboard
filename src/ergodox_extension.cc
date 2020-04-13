@@ -30,9 +30,11 @@ int main() {
 
   // Bottom right key.
   Key b3;
-  b3.SetParent(b2);
-  b3.SetPosition(kKeySpacing, -9, 1);
-  b3.extra_z = 1;
+  b3.Configure([&](Key& k) {
+    k.SetParent(b2);
+    k.SetPosition(kKeySpacing, -9, 1);
+    k.extra_z = 1;
+  });
 
   // Mid right key.
   Key t3;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <functional>
 #include <memory>
 
 #include "scad.h"
@@ -50,6 +51,10 @@ struct Key {
   // The distance back that the switch should be placed. By default the origin is at the top of the
   // dsa key cap.
   double switch_z_offset = kDsaHeight + 6.4;
+
+  void Configure(std::function<void(Key& k)> fn) {
+    fn(*this);
+  }
 
   Key& SetPosition(double x, double y, double z);
   Key& SetParent(const Key& key);

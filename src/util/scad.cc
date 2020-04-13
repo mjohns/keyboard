@@ -1,5 +1,10 @@
 #include "scad.h"
 
+// Windows!
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include <math.h>
 #include <cstdio>
 #include <memory>
@@ -175,7 +180,7 @@ Shape Cylinder(double height, double radius, Optional<double> fn) {
 Shape Polygon(const std::vector<Point2d>& points) {
   return Shape::Primitive([=](std::FILE* file) {
     fprintf(file, "polygon (points = [");
-    for (int i = 0; i < points.size(); ++i) {
+    for (size_t i = 0; i < points.size(); ++i) {
       const Point2d& p = points[i];
       if (i != 0) {
         fputc(',', file);
@@ -200,7 +205,7 @@ Shape Polyhedron(const std::vector<Point3d>& points,
                  int convexity) {
   return Shape::Primitive([=](std::FILE* file) {
     fprintf(file, "polyhedron (points = [");
-    for (int i = 0; i < points.size(); ++i) {
+    for (size_t i = 0; i < points.size(); ++i) {
       const Point3d& p = points[i];
       if (i > 0) {
         fputc(',', file);
@@ -208,13 +213,13 @@ Shape Polyhedron(const std::vector<Point3d>& points,
       fprintf(file, "[%.3f, %.3f, %.3f]", p.x, p.y, p.z);
     }
     fprintf(file, "], faces = [");
-    for (int i = 0; i < faces.size(); ++i) {
+    for (size_t i = 0; i < faces.size(); ++i) {
       if (i > 0) {
         fputc(',', file);
       }
       const auto& face = faces[i];
       fprintf(file, "[");
-      for (int f = 0; f < face.size(); ++f) {
+      for (size_t f = 0; f < face.size(); ++f) {
         if (f != 0) {
           fputc(',', file);
         }
@@ -394,8 +399,16 @@ void Shape::AppendScad(std::FILE* file, int indent_level) const {
 }
 
 void Shape::WriteToFile(const std::string& file_name) const {
-  std::FILE* file = std::fopen(file_name.c_str(), "w");
-  if (file == nullptr) {
+  std::FILE* file = nullptr;
+  bool opened = false;
+#ifdef _WIN32
+  opened = fopen_s(&file, file_name.c_str(), "w") == 0;
+#else
+  file = std::fopen(file_name.c_str(), "w");
+  opened = file != nullptr;
+#endif
+
+  if (!opened || file == nullptr) {
     fprintf(stderr, "Could not open file %s\n", file_name.c_str());
     return;
   }

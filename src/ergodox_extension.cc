@@ -85,7 +85,6 @@ int main() {
   Shape base_outline =
       (base_outline_right + base_outline_bottom) - (base_inner_bottom + base_inner_right);
 
-
   // Shapes to cut any overhang off the sides and top.
   Shape full_base = Union(base_right, base_bottom);
   Shape horizontal_bounds =
@@ -99,7 +98,6 @@ int main() {
                         .TranslateZ(kPlateHeight);
   Shape top_bounds =
       Cube(800, 800, 100).TranslateZ(50).RotateY(kRotationY).TranslateZ(kPlateHeight);
-
 
   Shape ext = base_outline.Projection()
                   .LinearExtrude(40)

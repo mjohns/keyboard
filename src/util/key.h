@@ -17,6 +17,8 @@ const double kWallWidth = 2;
 
 const double kDsaHeight = 8;
 const double kSaHeight = 12.5;
+// This is the height of the taller side on the key. The short side has kSaHeight.
+const double kSaEdgeHeight = 13.7;
 const double kDsaTopSize = 13.2;     // 0.5 * kMmPerInch;
 const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
 // The size half way up the key used to generate the cap shape.
@@ -29,7 +31,9 @@ Shape GetCapsuleConnector();
 Shape GetSphereConnector();
 Shape GetPostConnector();
 
-enum class KeyType { DSA, SA };
+enum class KeyType { DSA, SA, SA_EDGE };
+// For SA edge variants. Which side of the key the edge should be rendered.
+enum class SaEdgeType { LEFT, RIGHT, TOP, BOTTOM };
 
 struct Key {
  public:
@@ -61,6 +65,7 @@ struct Key {
   bool disable_switch_z_offset = false;
 
   KeyType type = KeyType::DSA;
+  SaEdgeType sa_edge_type = SaEdgeType::BOTTOM;
 
   void Configure(std::function<void(Key& k)> fn) {
     fn(*this);

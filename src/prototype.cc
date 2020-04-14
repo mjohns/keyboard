@@ -47,7 +47,6 @@ int main() {
   Key index_2 = top_template;
   index_2.Configure([&](Key& k) {
     k.name = "index_2";
-    k.type = KeyType::SA_EDGE;
     k.SetParent(index_1);
     k.t().z += .4;
   });

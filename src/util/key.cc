@@ -75,11 +75,42 @@ Shape MakeSaCap() {
   });
 }
 
+Shape MakeSaTallCap() {
+  return MakeCap({
+      {kSaTallHeight / 2, kDsaBottomSize},
+      {kSaTallHeight / 2, kSaHalfSize},
+      {0, kDsaTopSize},
+  });
+}
+
 Shape MakeSaEdgeCap(SaEdgeType edge_type) {
   // Everything will be the same as the sa cap in terms of offsets. Will just visually add the edge.
   Shape sa_cap = MakeSaCap();
 
   double edge_height = kSaEdgeHeight - kSaHeight;
+  Shape bar = Cube(kDsaTopSize, .01, .01);
+  double half_top = kDsaTopSize * .5;
+
+  Shape bottom_edge = Union(Hull(sa_cap,
+                                 bar.TranslateY(-1 * half_top),
+                                 bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
+                                 bar.TranslateY(half_top)));
+  switch (edge_type) {
+    case SaEdgeType::LEFT:
+      return bottom_edge.RotateZ(-90);
+    case SaEdgeType::RIGHT:
+      return bottom_edge.RotateZ(90);
+    case SaEdgeType::TOP:
+      return bottom_edge.RotateZ(180);
+    case SaEdgeType::BOTTOM:
+      return bottom_edge;
+  }
+}
+
+Shape MakeSaTallEdgeCap(SaEdgeType edge_type) {
+  Shape sa_cap = MakeSaTallCap();
+
+  double edge_height = kSaTallEdgeHeight - kSaTallHeight;
   Shape bar = Cube(kDsaTopSize, .01, .01);
   double half_top = kDsaTopSize * .5;
 
@@ -193,6 +224,10 @@ Shape Key::GetCap(bool fill_in_cap_path) const {
     case KeyType::SA_EDGE:
       cap = MakeSaEdgeCap(sa_edge_type);
       cap_height = kSaHeight;
+      break;
+    case KeyType::SA_TALL_EDGE:
+      cap = MakeSaTallEdgeCap(sa_edge_type);
+      cap_height = kSaTallHeight;
       break;
   }
   if (fill_in_cap_path) {

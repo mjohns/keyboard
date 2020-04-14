@@ -25,13 +25,18 @@ const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
 const double kDsaHalfSize = 16.2;
 const double kSaHalfSize = 17.2;
 
+// Size for the tall sa edged key.
+const double kSaTallHeight = 14;
+const double kSaTallEdgeHeight = 16.5;
+
+
 const double kSwitchHorizontalOffset = kSwitchWidth / 2 + kWallWidth;
 
 Shape GetCapsuleConnector();
 Shape GetSphereConnector();
 Shape GetPostConnector();
 
-enum class KeyType { DSA, SA, SA_EDGE };
+enum class KeyType { DSA, SA, SA_EDGE, SA_TALL_EDGE };
 // For SA edge variants. Which side of the key the edge should be rendered.
 enum class SaEdgeType { LEFT, RIGHT, TOP, BOTTOM };
 

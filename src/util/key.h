@@ -1,8 +1,9 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <functional>
+#include <glm/glm.hpp>
 #include <memory>
+#include <string>
 
 #include "scad.h"
 #include "transform.h"
@@ -15,15 +16,20 @@ const double kSwitchThickness = 4;
 const double kWallWidth = 2;
 
 const double kDsaHeight = 8;
+const double kSaHeight = 12.5;
 const double kDsaTopSize = 13.2;     // 0.5 * kMmPerInch;
 const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
+// The size half way up the key used to generate the cap shape.
 const double kDsaHalfSize = 16.2;
+const double kSaHalfSize = 17.2;
 
 const double kSwitchHorizontalOffset = kSwitchWidth / 2 + kWallWidth;
 
 Shape GetCapsuleConnector();
 Shape GetSphereConnector();
 Shape GetPostConnector();
+
+enum class KeyType { DSA, DA };
 
 struct Key {
  public:
@@ -35,6 +41,10 @@ struct Key {
     t().y = y;
     t().z = z;
   }
+
+  // A name for debugging purposes. Can also be used to determine the names for
+  // key specific output files.
+  std::string name;
 
   TransformList parent_transforms;
   TransformList local_transforms;
@@ -48,9 +58,9 @@ struct Key {
   double extra_z = 0;
 
   bool add_side_nub = true;
-  // The distance back that the switch should be placed. By default the origin is at the top of the
-  // dsa key cap.
-  double switch_z_offset = kDsaHeight + 6.4;
+  bool disable_switch_z_offset = false;
+
+  KeyType type = KeyType::DSA;
 
   void Configure(std::function<void(Key& k)> fn) {
     fn(*this);
@@ -73,12 +83,22 @@ struct Key {
 
   Shape GetSwitch() const;
   Shape GetInverseSwitch() const;
-  Shape GetCap() const;
+  Shape GetCap(bool fill_in_cap_path = false) const;
 
-  TransformList GetTopRight() const;
-  TransformList GetTopLeft() const;
-  TransformList GetBottomRight() const;
-  TransformList GetBottomLeft() const;
+  // This is the outermost conner of the switch. You can specify an offset to scale the point back
+  // by the specified x,y amount towards the center of the switch. If you had a centered 2x2 post
+  // and you wanted the corner to line up with outmost point of the switch, you could specify an
+  // offset of -1.
+  TransformList GetTopRight(double offset = 0) const;
+  TransformList GetTopLeft(double offset = 0) const;
+  TransformList GetBottomRight(double offset = 0) const;
+  TransformList GetBottomLeft(double offset = 0) const;
+  // The same as GetSwitchTransforms but with a more clear name if you are intending to find the
+  // middle point.
+  TransformList GetMiddle() const;
+
+  // Corners clockwise starting at top left. Will have size 4.
+  std::vector<TransformList> GetCorners(double offset = 0) const;
 
  private:
   TransformList GetTopRightInternal() const;
@@ -87,13 +107,20 @@ struct Key {
   TransformList GetBottomLeftInternal() const;
 };
 
-Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector = GetPostConnector());
-Shape ConnectHorizontal(const Key& left, const Key& right, Shape connector = GetPostConnector());
+Shape ConnectVertical(const Key& top,
+                      const Key& bottom,
+                      Shape connector = GetPostConnector(),
+                      double offset = 0);
+Shape ConnectHorizontal(const Key& left,
+                        const Key& right,
+                        Shape connector = GetPostConnector(),
+                        double offset = 0);
 Shape ConnectDiagonal(const Key& top_left,
                       const Key& top_right,
                       const Key& bottom_right,
                       const Key& bottom_left,
-                      Shape connector = GetPostConnector());
+                      Shape connector = GetPostConnector(),
+                      double offset = 0);
 Shape Tri(const TransformList& t1,
           const TransformList& t2,
           const TransformList& t3,

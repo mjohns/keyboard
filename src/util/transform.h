@@ -7,6 +7,8 @@
 
 namespace scad {
 
+const glm::vec3 kOrigin(0, 0, 0);
+
 struct Transform {
  public:
   float x = 0;

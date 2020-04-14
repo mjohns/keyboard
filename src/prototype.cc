@@ -24,8 +24,14 @@ int main() {
   top_template.type = KeyType::SA;
 
   Key bottom_template{0, -1 * (kDefaultKeySpacing - 2.4), 1};
-  bottom_template.t().rx = -18;
-  bottom_template.type = KeyType::SA;
+  bottom_template.Configure([&](Key& k) {
+    k.t().rx = -18;
+    k.type = KeyType::SA;
+
+    // angle it more and move down -- changes
+    k.t().rx += -2;
+    k.t().z += -1;
+  });
 
   Key index_1;
   index_1.Configure([&](Key& k) {
@@ -42,6 +48,7 @@ int main() {
   index_2.Configure([&](Key& k) {
     k.name = "index_2";
     k.SetParent(index_1);
+    k.t().z += .4;
   });
 
   Key index_0 = bottom_template;
@@ -54,11 +61,12 @@ int main() {
   Key index_inner_1;
   index_inner_1.Configure([&](Key& k) {
     k.name = "index_inner_1";
+    k.type = KeyType::SA;
     k.SetParent(index_1);
     k.SetPosition(kDefaultKeySpacing, -1, .8);
-    k.t().ry = -5;
+    k.t().ry = -7;
 
-    k.t().x -= .4;
+    k.t().x -= .6;
     k.t().z += 2;
   });
 
@@ -66,12 +74,24 @@ int main() {
   index_inner_2.Configure([&](Key& k) {
     k.name = "index_inner_2";
     k.SetParent(index_inner_1);
-    k.t().ry += -2;
     k.t().rx += 2;
-    k.t().x += -.95;
+    k.t().x += -.75;
     k.t().z += 1.6;
     k.t().y += -1.2;
   });
+
+  Key index_inner_0 = bottom_template;
+  index_inner_0.Configure([&](Key& k) {
+    k.name = "index_inner_0";
+    k.SetParent(index_inner_1);
+    k.t().rx += 2;
+    k.t().x += -.75;
+    k.t().z += 1;
+    k.t().y += 1.2;
+  });
+
+  // Final customization of index_inner_1 without moving children.
+  index_inner_1.Configure([&](Key& k) { k.t().x += -.5; });
 
   // This is the s column.
   Key ring_1;
@@ -98,12 +118,13 @@ int main() {
                                  &index_0,
                                  &index_inner_1,
                                  &index_inner_2,
+                                 &index_inner_0,
                                  &middle_1,
                                  &ring_1,
                                  &ring_outer_1};
 
   std::vector<Key*> keys_to_print = {
-      &index_1, &index_2, &index_0, &index_inner_1, &index_inner_2, &middle_1};
+      &index_1, &index_2, &index_0, &index_inner_1, &index_inner_0, &index_inner_2, &middle_1};
 
   std::vector<Shape> shapes;
   for (Key* key : keys_to_print) {

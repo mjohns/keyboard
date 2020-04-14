@@ -29,6 +29,7 @@ int main() {
 
   Key index_1;
   index_1.Configure([&](Key& k) {
+    k.name = "index_1";
     k.SetParent(middle_1);
     k.SetPosition(kDefaultKeySpacing, -2.7, 5.1);
     k.t().ry = -5;
@@ -38,14 +39,21 @@ int main() {
   });
 
   Key index_2 = top_template;
-  index_2.Configure([&](Key& k) { k.SetParent(index_1); });
+  index_2.Configure([&](Key& k) {
+    k.name = "index_2";
+    k.SetParent(index_1);
+  });
 
   Key index_0 = bottom_template;
-  index_0.Configure([&](Key& k) { k.SetParent(index_1); });
+  index_0.Configure([&](Key& k) {
+    k.name = "index_0";
+    k.SetParent(index_1);
+  });
 
   // This is the inner column - g
   Key index_inner_1;
   index_inner_1.Configure([&](Key& k) {
+    k.name = "index_inner_1";
     k.SetParent(index_1);
     k.SetPosition(kDefaultKeySpacing, -1, .8);
     k.t().ry = -5;
@@ -56,6 +64,7 @@ int main() {
 
   Key index_inner_2 = top_template;
   index_inner_2.Configure([&](Key& k) {
+    k.name = "index_inner_2";
     k.SetParent(index_inner_1);
     k.t().ry += -2;
     k.t().rx += 2;
@@ -67,6 +76,7 @@ int main() {
   // This is the s column.
   Key ring_1;
   ring_1.Configure([&](Key& k) {
+    k.name = "ring_1";
     k.SetParent(middle_1);
     k.SetPosition(-1 * (kDefaultKeySpacing), -1, 2);
     k.t().ry = 3;
@@ -77,6 +87,7 @@ int main() {
 
   Key ring_outer_1;
   ring_outer_1.Configure([&](Key& k) {
+    k.name = "ring_outer_1";
     k.SetParent(ring_1);
     k.SetPosition(-1 * (kDefaultKeySpacing), -1, 1);
     k.t().ry = 4;
@@ -91,19 +102,35 @@ int main() {
                                  &ring_1,
                                  &ring_outer_1};
 
-  main_keys = {&index_1, &index_2, &index_0, &index_inner_1, &index_inner_2, &middle_1};
+  std::vector<Key*> keys_to_print = {
+      &index_1, &index_2, &index_0, &index_inner_1, &index_inner_2, &middle_1};
 
-  std::vector<Shape> main_shapes;
-  for (Key* key : main_keys) {
+  std::vector<Shape> shapes;
+  for (Key* key : keys_to_print) {
     key->add_side_nub = false;
     key->extra_z = 4;
-    main_shapes.push_back(key->GetSwitch());
+    shapes.push_back(key->GetSwitch());
     if (kShowCaps) {
-      main_shapes.push_back(key->GetCap(true).Color("red"));
+      shapes.push_back(key->GetCap(true).Color("red"));
     }
   }
 
-  UnionAll(main_shapes).WriteToFile("main.scad");
+  UnionAll(shapes).WriteToFile("main.scad");
+
+  // Print out distances between close keys.
+  for (Key* key : main_keys) {
+    glm::vec3 v1 = key->GetTransforms().Apply(kOrigin);
+    for (Key* other_key : main_keys) {
+      if (key != other_key) {
+        glm::vec3 v2 = other_key->GetTransforms().Apply(kOrigin);
+        float length = glm::length(v2 - v1);
+        if (length < 20) {
+          printf(
+              "Distance from %s -> %s: %.1f\n", key->name.c_str(), other_key->name.c_str(), length);
+        }
+      }
+    }
+  }
 }
 
 void DropWalls() {

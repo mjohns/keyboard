@@ -157,7 +157,8 @@ Shape Key::GetSwitch() const {
 Shape Key::GetCap(bool fill_in_cap_path) const {
   Shape cap = type == KeyType::DSA ? MakeDsaCap() : MakeSaCap();
   if (fill_in_cap_path) {
-    Shape bottom = cap.Projection().LinearExtrude(6).TranslateZ(-3 - kDsaHeight);
+    double cap_height = type == KeyType::DSA ? kDsaHeight : kSaHeight;
+    Shape bottom = cap.Projection().LinearExtrude(6).TranslateZ(-3 - cap_height);
     cap = cap.Add(bottom);
   }
   return GetTransforms().Apply(cap);

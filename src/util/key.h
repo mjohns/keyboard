@@ -29,7 +29,7 @@ Shape GetCapsuleConnector();
 Shape GetSphereConnector();
 Shape GetPostConnector();
 
-enum class KeyType { DSA, DA };
+enum class KeyType { DSA, SA };
 
 struct Key {
  public:

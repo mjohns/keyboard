@@ -19,6 +19,14 @@ int main() {
   Key middle_1;
   middle_1.t().z += 15;
 
+  Key top_template{0, kDefaultKeySpacing - 1.4, 2.4};
+  top_template.t().rx = 12;
+  top_template.type = KeyType::SA;
+
+  Key bottom_template{0, -1 * (kDefaultKeySpacing - 2.4), 1};
+  bottom_template.t().rx = -18;
+  bottom_template.type = KeyType::SA;
+
   Key index_1;
   index_1.Configure([&](Key& k) {
     k.SetParent(middle_1);
@@ -29,9 +37,15 @@ int main() {
     k.t().x -= .4;
   });
 
+  Key index_2 = top_template;
+  index_2.Configure([&](Key& k) { k.SetParent(index_1); });
+
+  Key index_0 = bottom_template;
+  index_0.Configure([&](Key& k) { k.SetParent(index_1); });
+
   // This is the inner column - g
-  Key index2_1;
-  index2_1.Configure([&](Key& k) {
+  Key index_inner_1;
+  index_inner_1.Configure([&](Key& k) {
     k.SetParent(index_1);
     k.SetPosition(kDefaultKeySpacing, -1, .8);
     k.t().ry = -5;
@@ -40,6 +54,17 @@ int main() {
     k.t().z += 2;
   });
 
+  Key index_inner_2 = top_template;
+  index_inner_2.Configure([&](Key& k) {
+    k.SetParent(index_inner_1);
+    k.t().ry += -2;
+    k.t().rx += 2;
+    k.t().x += -.95;
+    k.t().z += 1.6;
+    k.t().y += -1.2;
+  });
+
+  // This is the s column.
   Key ring_1;
   ring_1.Configure([&](Key& k) {
     k.SetParent(middle_1);
@@ -50,14 +75,23 @@ int main() {
     k.t().z -= 2;
   });
 
-  Key ring2_1;
-  ring2_1.Configure([&](Key& k) {
+  Key ring_outer_1;
+  ring_outer_1.Configure([&](Key& k) {
     k.SetParent(ring_1);
     k.SetPosition(-1 * (kDefaultKeySpacing), -1, 1);
     k.t().ry = 4;
   });
 
-  std::vector<Key*> main_keys = {&index_1, &index2_1, &middle_1, &ring_1, &ring2_1};
+  std::vector<Key*> main_keys = {&index_1,
+                                 &index_2,
+                                 &index_0,
+                                 &index_inner_1,
+                                 &index_inner_2,
+                                 &middle_1,
+                                 &ring_1,
+                                 &ring_outer_1};
+
+  main_keys = {&index_1, &index_2, &index_0, &index_inner_1, &index_inner_2, &middle_1};
 
   std::vector<Shape> main_shapes;
   for (Key* key : main_keys) {
@@ -69,45 +103,7 @@ int main() {
     }
   }
 
-  // Chop everything off below z = 0.
-  Shape floor = Cube(1000).TranslateZ(-500);
-
-  UnionAll(main_shapes).Subtract(floor).WriteToFile("main.scad");
-
-  Key key;
-  key.extra_z = 7;
-  /*
-  key.SetPosition(20, 30, 15);
-  key.t().ry = 10;
-  */
-
-  double prong_height = 5;
-  double prong_side_thickness = 1.5;
-  Shape prong = Cube(prong_side_thickness, 4, prong_height)
-                    .TranslateZ(prong_height / (-2))
-                    .Add(Cylinder(4, 1, 30).RotateX(90).TranslateZ(1 - 3.2).TranslateX(.4))
-                    .TranslateX(-.5 * prong_side_thickness);
-
-  Shape fat_prong = prong + prong.TranslateX(-.5);
-  double split = 10;
-
-  Shape prong_connector = (prong + prong.MirrorX().TranslateX(split)).TranslateX(split / (-2));
-  Shape prong_bottom = Cube(prong_side_thickness * 2 + split, 4, 2).TranslateZ(-1 - prong_height);
-  prong_connector = prong_connector.Add(prong_bottom).TranslateZ(prong_height);
-
-  Shape prong_hole = Cube(2, 4, 4).TranslateZ(2);
-  double hole_distance = (split * .5) + 1;
-  Shape bottom =
-      Cube(20, 20, 2).TranslateZ(1).Subtract(Union(prong_connector,
-                                                   prong_hole.TranslateX(hole_distance * -1),
-                                                   prong_hole.TranslateX(hole_distance)));
-
-  // Shape male_connector = Cube(5, 2,
-  // 1).Projection().LinearExtrude(connector_params).TranslateZ(connector_params.height / 2);
-  Union(bottom.TranslateX(6), prong_connector).WriteToFile("connectors.scad");
-
-  bottom.WriteToFile("bottom.scad");
-  prong_connector.WriteToFile("prong.scad");
+  UnionAll(main_shapes).WriteToFile("main.scad");
 }
 
 void DropWalls() {

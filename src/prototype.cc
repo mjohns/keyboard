@@ -7,7 +7,7 @@ using namespace scad;
 
 // Default spacing between keys. 19mm seems to be the most common spacing in boards.
 constexpr double kDefaultKeySpacing = 19;
-constexpr bool kShowCaps = false;
+constexpr bool kShowCaps = true;
 
 int main() {
   // The keys are indexed with 0 being the bottom row, 1 the home row, 2 the row above etc.
@@ -47,6 +47,7 @@ int main() {
   Key index_2 = top_template;
   index_2.Configure([&](Key& k) {
     k.name = "index_2";
+    k.type = KeyType::SA_EDGE;
     k.SetParent(index_1);
     k.t().z += .4;
   });

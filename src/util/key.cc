@@ -75,6 +75,30 @@ Shape MakeSaCap() {
   });
 }
 
+Shape MakeSaEdgeCap(SaEdgeType edge_type) {
+  // Everything will be the same as the sa cap in terms of offsets. Will just visually add the edge.
+  Shape sa_cap = MakeSaCap();
+
+  double edge_height = kSaEdgeHeight - kSaHeight;
+  Shape bar = Cube(kDsaTopSize, .01, .01);
+  double half_top = kDsaTopSize * .5;
+
+  Shape bottom_edge = Union(Hull(sa_cap,
+                                 bar.TranslateY(-1 * half_top),
+                                 bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
+                                 bar.TranslateY(half_top)));
+  switch (edge_type) {
+    case SaEdgeType::LEFT:
+      return bottom_edge.RotateZ(-90);
+    case SaEdgeType::RIGHT:
+      return bottom_edge.RotateZ(90);
+    case SaEdgeType::TOP:
+      return bottom_edge.RotateZ(180);
+    case SaEdgeType::BOTTOM:
+      return bottom_edge;
+  }
+}
+
 }  // namespace
 
 Key& Key::SetPosition(double x, double y, double z) {
@@ -155,9 +179,23 @@ Shape Key::GetSwitch() const {
 }
 
 Shape Key::GetCap(bool fill_in_cap_path) const {
-  Shape cap = type == KeyType::DSA ? MakeDsaCap() : MakeSaCap();
+  Shape cap;
+  double cap_height = 0;
+  switch (type) {
+    case KeyType::DSA:
+      cap = MakeDsaCap();
+      cap_height = kDsaHeight;
+      break;
+    case KeyType::SA:
+      cap = MakeSaCap();
+      cap_height = kSaHeight;
+      break;
+    case KeyType::SA_EDGE:
+      cap = MakeSaEdgeCap(sa_edge_type);
+      cap_height = kSaHeight;
+      break;
+  }
   if (fill_in_cap_path) {
-    double cap_height = type == KeyType::DSA ? kDsaHeight : kSaHeight;
     Shape bottom = cap.Projection().LinearExtrude(6).TranslateZ(-3 - cap_height);
     cap = cap.Add(bottom);
   }

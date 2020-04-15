@@ -270,7 +270,7 @@ Shape CreateCheapRaft(const std::vector<Key*> keys) {
   }
 
   std::vector<Shape> shapes;
-  Shape c = Cube(2, 2, 1).TranslateZ(.5);
+  Shape c = Cube(1).TranslateZ(.5);
   const glm::vec3 offset(0, 0, -4);
   for (TransformList t : points) {
     glm::vec3 p = t.Apply(offset);

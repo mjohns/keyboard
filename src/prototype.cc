@@ -7,7 +7,7 @@ using namespace scad;
 
 // Default spacing between keys. 19mm seems to be the most common spacing in boards.
 constexpr double kDefaultKeySpacing = 19;
-constexpr bool kShowCaps = true;
+constexpr bool kShowCaps = false;
 
 int main() {
   // The keys are indexed with 0 being the bottom row, 1 the home row, 2 the row above etc.
@@ -28,6 +28,17 @@ int main() {
     k.t().z += -1;
   });
 
+  // Template for number row keys.
+  Key top_top_template{0, kDefaultKeySpacing - 2.5, 2.4};
+  top_top_template.Configure([&](Key& k) {
+    k.t().rx = 19;
+    k.type = KeyType::SA_TALL_EDGE;
+    k.sa_edge_type = SaEdgeType::BOTTOM;
+
+    k.AddTransform();
+    k.t().z = .3;
+  });
+
   // Main keys. These are the keys for the ring - index fingers. Pinky and thumb are handled
   // separately.
   Key middle_1;
@@ -46,6 +57,12 @@ int main() {
     // rotational orientation.
     k.AddTransform();
     k.t().z += .3;
+  });
+
+  Key middle_3 = top_top_template;
+  middle_3.Configure([&](Key& k) {
+    k.name = "middle_3";
+    k.SetParent(middle_2);
   });
 
   Key middle_0 = bottom_template;
@@ -179,6 +196,7 @@ int main() {
       &middle_0,
       &middle_1,
       &middle_2,
+      &middle_3,
       &ring_0,
       &ring_1,
       &ring_2,
@@ -186,8 +204,8 @@ int main() {
       &ring_outer_2,
   };
 
-  std::vector<Key*> keys_to_print = {&index_1, &index_2, &middle_1, &middle_2};
-  keys_to_print = main_keys;
+  std::vector<Key*> keys_to_print = {&middle_1, &middle_2, &middle_3};
+  //keys_to_print = main_keys;
 
   std::vector<Shape> shapes;
   for (Key* key : keys_to_print) {

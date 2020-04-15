@@ -29,14 +29,18 @@ const double kSaHalfSize = 17.2;
 const double kSaTallHeight = 14;
 const double kSaTallEdgeHeight = 16.5;
 
-
 const double kSwitchHorizontalOffset = kSwitchWidth / 2 + kWallWidth;
 
 Shape GetCapsuleConnector();
 Shape GetSphereConnector();
 Shape GetPostConnector();
 
-enum class KeyType { DSA, SA, SA_EDGE, SA_TALL_EDGE };
+enum class KeyType {
+  DSA,
+  SA,            // Row 3
+  SA_EDGE,       // Row 2,
+  SA_TALL_EDGE,  // Row 3
+};
 // For SA edge variants. Which side of the key the edge should be rendered.
 enum class SaEdgeType { LEFT, RIGHT, TOP, BOTTOM };
 

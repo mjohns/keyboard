@@ -67,6 +67,15 @@ Shape MakeDsaCap() {
   });
 }
 
+Shape MakeSaCapPretty() {
+  Shape c = Cylinder({.h = 33, .r1 = 33, .r2 = 33, .fn = 200, .center = false});
+  Shape cap = Intersection(c.Rotate(90, 0, 0).Translate(24, 16, 0),
+                           c.Rotate(90, 0, 90).Translate(-16, 24, 0),
+                           c.Rotate(90, 0, 180).Translate(-24, -16, 0),
+                           c.Rotate(90, 0, 270).Translate(16, -24, 0));
+  return Difference(cap, Sphere(33, 190).TranslateZ(46), Cube(66).TranslateZ(-31)).TranslateZ(-14);
+}
+
 Shape MakeSaCap() {
   return MakeCap({
       {kSaHeight / 2, kDsaBottomSize},
@@ -83,6 +92,20 @@ Shape MakeSaTallCap() {
   });
 }
 
+// Expects the edge to be on the bottom.
+Shape RotateCapEdge(Shape s, SaEdgeType edge_type) {
+  switch (edge_type) {
+    case SaEdgeType::LEFT:
+      return s.RotateZ(-90);
+    case SaEdgeType::RIGHT:
+      return s.RotateZ(90);
+    case SaEdgeType::TOP:
+      return s.RotateZ(180);
+    case SaEdgeType::BOTTOM:
+      return s;
+  }
+}
+
 Shape MakeSaEdgeCap(SaEdgeType edge_type) {
   // Everything will be the same as the sa cap in terms of offsets. Will just visually add the edge.
   Shape sa_cap = MakeSaCap();
@@ -95,16 +118,7 @@ Shape MakeSaEdgeCap(SaEdgeType edge_type) {
                                  bar.TranslateY(-1 * half_top),
                                  bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
                                  bar.TranslateY(half_top)));
-  switch (edge_type) {
-    case SaEdgeType::LEFT:
-      return bottom_edge.RotateZ(-90);
-    case SaEdgeType::RIGHT:
-      return bottom_edge.RotateZ(90);
-    case SaEdgeType::TOP:
-      return bottom_edge.RotateZ(180);
-    case SaEdgeType::BOTTOM:
-      return bottom_edge;
-  }
+  return RotateCapEdge(bottom_edge, edge_type);
 }
 
 Shape MakeSaTallEdgeCap(SaEdgeType edge_type) {
@@ -118,16 +132,7 @@ Shape MakeSaTallEdgeCap(SaEdgeType edge_type) {
                                  bar.TranslateY(-1 * half_top),
                                  bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
                                  bar.TranslateY(half_top)));
-  switch (edge_type) {
-    case SaEdgeType::LEFT:
-      return bottom_edge.RotateZ(-90);
-    case SaEdgeType::RIGHT:
-      return bottom_edge.RotateZ(90);
-    case SaEdgeType::TOP:
-      return bottom_edge.RotateZ(180);
-    case SaEdgeType::BOTTOM:
-      return bottom_edge;
-  }
+  return RotateCapEdge(bottom_edge, edge_type);
 }
 
 }  // namespace

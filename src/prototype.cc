@@ -9,6 +9,9 @@ using namespace scad;
 constexpr double kDefaultKeySpacing = 19;
 constexpr bool kShowCaps = false;
 
+Shape CreatePosts(const std::vector<Key*> keys);
+Shape CreateCheapRaft(const std::vector<Key*> keys);
+
 int main() {
   // The keys are indexed with 0 being the bottom row, 1 the home row, 2 the row above etc.
   // Everything is centered around the middle finger column and all keys are ultimately relative to
@@ -43,7 +46,7 @@ int main() {
   });
 
   Key main_origin;
-  main_origin.Configure([&](Key& k) { k.SetPosition(0, 0, 24); });
+  main_origin.Configure([&](Key& k) { k.SetPosition(0, 0, 27); });
 
   // Main keys. These are the keys for the ring - index fingers. Pinky and thumb are handled
   // separately.
@@ -228,8 +231,8 @@ int main() {
   }
 
   shapes.push_back(CreateCheapRaft(keys_to_print));
+  shapes.push_back(CreatePosts(keys_to_print));
   UnionAll(shapes).WriteToFile("main.scad");
-
 
   // Print out distances between close keys.
   for (Key* key : main_keys) {
@@ -247,82 +250,39 @@ int main() {
   }
 }
 
-void DropWalls() {
-  /*
-  // Drop the switch walls down.
-  Shape connector = Cube(2);
-  double connector_offset = -1;
-  auto corners = key->GetCorners(connector_offset);
-  for (int i = 0; i < 4; ++i) {
-    TransformList t = corners[i];
-    TransformList t_next = corners[(i + 1) % 4];
-
-    // Shapes on ground.
-    glm::vec3 ground = t.Apply(kOrigin);
-    ground.z = 0;
-    glm::vec3 ground_next = t_next.Apply(kOrigin);
-    ground_next.z = 0;
-
-    main_shapes.push_back(Hull(connector.Translate(ground).TranslateZ(1),
-                               connector.Translate(ground_next).TranslateZ(1),
-                               t.Apply(connector.TranslateZ(-3)),
-                               t_next.Apply(connector.TranslateZ(-3))));
+Shape CreatePosts(const std::vector<Key*> keys) {
+  std::vector<Shape> shapes;
+  Shape connector = Cube(2, 2, .001).TranslateZ(-4);
+  for (Key* k : keys) {
+    for (auto t : k->GetCorners(-1)) {
+      Shape top = t.Apply(connector);
+      shapes.push_back(Hull(top, top.Projection().LinearExtrude(1).TranslateZ(.5)));
+    }
   }
-  */
+  return UnionAll(shapes);
 }
 
 // Create a square grid on the ground enclosing all the keys.
 Shape CreateCheapRaft(const std::vector<Key*> keys) {
   std::vector<TransformList> points;
   for (Key* k : keys) {
+    PushBackAll(&points, k->GetCorners(-1));
   }
 
-  double left = 1000;
-  double right = -1000;
-  double top = -1000;
-  double bottom = 1000;
-
-  for (Key* k : keys) {
-    double k_left = std::min(k->GetTopLeft().Apply(kOrigin).x, k->GetBottomLeft().Apply(kOrigin).x);
-    double k_right =
-        std::max(k->GetTopRight().Apply(kOrigin).x, k->GetBottomRight().Apply(kOrigin).x);
-    double k_top = std::max(k->GetTopRight().Apply(kOrigin).y, k->GetTopLeft().Apply(kOrigin).y);
-    double k_bottom =
-        std::min(k->GetBottomRight().Apply(kOrigin).y, k->GetBottomLeft().Apply(kOrigin).y);
-
-    left = std::min(left, k_left);
-    right = std::max(right, k_right);
-    top = std::max(top, k_top);
-    bottom = std::min(bottom, k_bottom);
-  }
-
-  double step = 8;
-  double thick = 2;
-
-  double width = right - left;
-  double height = top - bottom;
-  Shape horizontal = Cube(width, thick, thick).TranslateZ(thick / 2).TranslateX(width / 2 + left);
-  Shape vertical = Cube(thick, height, thick).TranslateZ(thick / 2).TranslateY(height / 2 + bottom);
-
-  printf("b %f, l %f, r %f, t %f\n", bottom, left, right, top);
   std::vector<Shape> shapes;
-  double y = top;
-  while (true) {
-    shapes.push_back(horizontal.TranslateY(y));
-    if (y < bottom) {
-      break;
+  Shape c = Cube(2, 2, 1).TranslateZ(.5);
+  const glm::vec3 offset(0, 0, -4);
+  for (TransformList t : points) {
+    glm::vec3 p = t.Apply(offset);
+    p.z = 0;
+    for (TransformList other_t : points) {
+      glm::vec3 other_p = other_t.Apply(offset);
+      other_p.z = 0;
+      float distance = glm::length(other_p - p);
+      if (distance > 1 && distance < 22) {
+        shapes.push_back(Hull(c.Translate(p), c.Translate(other_p)));
+      }
     }
-    y -= step;
-  }
-
-  double x = left;
-  while (true) {
-    shapes.push_back(vertical.TranslateX(x));
-    if (x > right) {
-      break;
-    }
-    x += step;
   }
   return UnionAll(shapes);
 }
-

@@ -7,17 +7,12 @@ using namespace scad;
 
 // Default spacing between keys. 19mm seems to be the most common spacing in boards.
 constexpr double kDefaultKeySpacing = 19;
-constexpr bool kShowCaps = true;
+constexpr bool kShowCaps = false;
 
 int main() {
   // The keys are indexed with 0 being the bottom row, 1 the home row, 2 the row above etc.
   // Everything is centered around the middle finger column and all keys are ultimately relative to
   // the d key (based on left hand).
-
-  // Main keys. These are the keys for the ring - index fingers. Pinky and thumb are handled
-  // separately.
-  Key middle_1;
-  middle_1.t().z += 15;
 
   Key top_template{0, kDefaultKeySpacing - 1.4, 2.4};
   top_template.t().rx = 12;
@@ -31,6 +26,32 @@ int main() {
     // angle it more and move down -- changes
     k.t().rx += -2;
     k.t().z += -1;
+  });
+
+  // Main keys. These are the keys for the ring - index fingers. Pinky and thumb are handled
+  // separately.
+  Key middle_1;
+  middle_1.Configure([&](Key& k) {
+    k.name = "middle_1";
+    k.t().z += 15;
+  });
+
+  Key middle_2 = top_template;
+  middle_2.Configure([&](Key& k) {
+    k.name = "middle_2";
+    k.SetParent(middle_1);
+    k.t().z += .4;
+
+    // Reset transform so now adding z will bring it forward relative to its no
+    // rotational orientation.
+    k.AddTransform();
+    k.t().z += .3;
+  });
+
+  Key middle_0 = bottom_template;
+  middle_0.Configure([&](Key& k) {
+    k.name = "middle_0";
+    k.SetParent(middle_1);
   });
 
   Key index_1;
@@ -49,6 +70,11 @@ int main() {
     k.name = "index_2";
     k.SetParent(index_1);
     k.t().z += .4;
+
+    // Reset transform so now adding z will bring it forward relative to its no
+    // rotational orientation.
+    k.AddTransform();
+    k.t().z += .3;
   });
 
   Key index_0 = bottom_template;
@@ -86,8 +112,8 @@ int main() {
     k.SetParent(index_inner_1);
     k.t().rx += 2;
     k.t().x += -.75;
-    k.t().z += 1;
-    k.t().y += 1.2;
+    // k.t().z += 1;
+    k.t().y += 1;
   });
 
   // Final customization of index_inner_1 without moving children.
@@ -105,26 +131,63 @@ int main() {
     k.t().z -= 2;
   });
 
+  Key ring_2 = top_template;
+  ring_2.Configure([&](Key& k) {
+    k.name = "ring_2";
+    k.SetParent(ring_1);
+    k.t().z += .4;
+
+    // Reset transform so now adding z will bring it forward relative to its no
+    // rotational orientation.
+    k.AddTransform();
+    k.t().z += .3;
+  });
+
+  Key ring_0 = bottom_template;
+  ring_0.Configure([&](Key& k) {
+    k.name = "ring_0";
+    k.SetParent(ring_1);
+  });
+
   Key ring_outer_1;
   ring_outer_1.Configure([&](Key& k) {
     k.name = "ring_outer_1";
+    k.type = KeyType::SA;
     k.SetParent(ring_1);
-    k.SetPosition(-1 * (kDefaultKeySpacing), -1, 1);
+    k.SetPosition(-1 * (kDefaultKeySpacing), 1.4, 1);
     k.t().ry = 4;
+    k.t().x += .3;
   });
 
-  std::vector<Key*> main_keys = {&index_1,
-                                 &index_2,
-                                 &index_0,
-                                 &index_inner_1,
-                                 &index_inner_2,
-                                 &index_inner_0,
-                                 &middle_1,
-                                 &ring_1,
-                                 &ring_outer_1};
+  Key ring_outer_2 = top_template;
+  ring_outer_2.Configure([&](Key& k) {
+    k.name = "ring_outer_2";
+    k.SetParent(ring_outer_1);
+    k.t().rx += -2;
+    k.t().x += .4;
+    k.t().z += 1.6;
+    k.t().y += -1.2;
+  });
 
-  std::vector<Key*> keys_to_print = {
-      &index_1, &index_2, &index_0, &index_inner_1, &index_inner_0, &index_inner_2, &middle_1};
+  std::vector<Key*> main_keys = {
+      &index_1,
+      &index_2,
+      &index_0,
+      &index_inner_1,
+      &index_inner_2,
+      &index_inner_0,
+      &middle_0,
+      &middle_1,
+      &middle_2,
+      &ring_0,
+      &ring_1,
+      &ring_2,
+      &ring_outer_1,
+      &ring_outer_2,
+  };
+
+  std::vector<Key*> keys_to_print = {&index_1, &index_2, &middle_1, &middle_2};
+  keys_to_print = main_keys;
 
   std::vector<Shape> shapes;
   for (Key* key : keys_to_print) {

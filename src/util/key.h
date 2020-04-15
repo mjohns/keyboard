@@ -38,8 +38,8 @@ Shape GetPostConnector();
 enum class KeyType {
   DSA,
   SA,            // Row 3
-  SA_EDGE,       // Row 2,
-  SA_TALL_EDGE,  // Row 3
+  SA_EDGE,       // Row 2
+  SA_TALL_EDGE,  // Row 1
 };
 // For SA edge variants. Which side of the key the edge should be rendered.
 enum class SaEdgeType { LEFT, RIGHT, TOP, BOTTOM };
@@ -139,5 +139,13 @@ Shape Tri(const TransformList& t1,
           const TransformList& t2,
           const TransformList& t3,
           Shape connector = GetPostConnector());
+
+Shape MakeDsaCap();
+
+Shape MakeSaCap();
+Shape MakeSaEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
+Shape MakeSaTallEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
+
+Shape MakeSwitch(bool add_side_nub = true);
 
 }  // namespace scad

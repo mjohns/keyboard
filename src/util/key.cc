@@ -13,28 +13,6 @@ namespace {
 const double kDsaSwitchZOffset = kDsaHeight + 6.4;
 const double kSaSwitchZOffset = kSaHeight + 6.4;
 
-Shape MakeSwitch(bool add_side_nub) {
-  std::vector<Shape> shapes;
-  Shape top_wall = Cube(kSwitchWidth + kWallWidth * 2, kWallWidth, kSwitchThickness)
-                       .Translate(0, kWallWidth / 2 + kSwitchWidth / 2, kSwitchThickness / 2);
-
-  shapes.push_back(top_wall);
-  shapes.push_back(top_wall.RotateZ(90));
-  shapes.push_back(top_wall.RotateZ(180));
-  shapes.push_back(top_wall.RotateZ(270));
-
-  if (add_side_nub) {
-    Shape side_nub =
-        Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
-                 .Translate(kWallWidth / 2 + kSwitchWidth / 2, 0, kSwitchThickness / 2),
-             Cylinder(2.75, 1, 30).RotateX(90).Translate(kSwitchWidth / 2, 0, 1));
-    shapes.push_back(side_nub);
-    shapes.push_back(side_nub.RotateZ(180));
-  }
-
-  return UnionAll(shapes).TranslateZ(kSwitchThickness * -1);
-}
-
 struct CapSegment {
   double height;
   double width;
@@ -57,6 +35,44 @@ Shape MakeCap(const std::vector<CapSegment>& segments) {
                          .TranslateZ(height_so_far));
   }
   return UnionAll(shapes).TranslateZ(-1 * height_so_far);
+}
+
+// Expects the edge to be on the bottom.
+Shape RotateCapEdge(Shape s, SaEdgeType edge_type) {
+  switch (edge_type) {
+    case SaEdgeType::LEFT:
+      return s.RotateZ(-90);
+    case SaEdgeType::RIGHT:
+      return s.RotateZ(90);
+    case SaEdgeType::TOP:
+      return s.RotateZ(180);
+    case SaEdgeType::BOTTOM:
+      return s;
+  }
+}
+
+}  // namespace
+
+Shape MakeSwitch(bool add_side_nub) {
+  std::vector<Shape> shapes;
+  Shape top_wall = Cube(kSwitchWidth + kWallWidth * 2, kWallWidth, kSwitchThickness)
+                       .Translate(0, kWallWidth / 2 + kSwitchWidth / 2, kSwitchThickness / 2);
+
+  shapes.push_back(top_wall);
+  shapes.push_back(top_wall.RotateZ(90));
+  shapes.push_back(top_wall.RotateZ(180));
+  shapes.push_back(top_wall.RotateZ(270));
+
+  if (add_side_nub) {
+    Shape side_nub =
+        Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
+                 .Translate(kWallWidth / 2 + kSwitchWidth / 2, 0, kSwitchThickness / 2),
+             Cylinder(2.75, 1, 30).RotateX(90).Translate(kSwitchWidth / 2, 0, 1));
+    shapes.push_back(side_nub);
+    shapes.push_back(side_nub.RotateZ(180));
+  }
+
+  return UnionAll(shapes).TranslateZ(kSwitchThickness * -1);
 }
 
 Shape MakeDsaCap() {
@@ -92,20 +108,6 @@ Shape MakeSaTallCap() {
   });
 }
 
-// Expects the edge to be on the bottom.
-Shape RotateCapEdge(Shape s, SaEdgeType edge_type) {
-  switch (edge_type) {
-    case SaEdgeType::LEFT:
-      return s.RotateZ(-90);
-    case SaEdgeType::RIGHT:
-      return s.RotateZ(90);
-    case SaEdgeType::TOP:
-      return s.RotateZ(180);
-    case SaEdgeType::BOTTOM:
-      return s;
-  }
-}
-
 Shape MakeSaEdgeCap(SaEdgeType edge_type) {
   // Everything will be the same as the sa cap in terms of offsets. Will just visually add the edge.
   Shape sa_cap = MakeSaCap();
@@ -134,8 +136,6 @@ Shape MakeSaTallEdgeCap(SaEdgeType edge_type) {
                                  bar.TranslateY(half_top)));
   return RotateCapEdge(bottom_edge, edge_type);
 }
-
-}  // namespace
 
 Key& Key::SetPosition(double x, double y, double z) {
   t().x = x;

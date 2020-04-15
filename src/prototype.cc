@@ -35,16 +35,22 @@ int main() {
     k.type = KeyType::SA_TALL_EDGE;
     k.sa_edge_type = SaEdgeType::BOTTOM;
 
+    // Feedback - too close move back a little
+    k.t().y += 1.2;
+
     k.AddTransform();
     k.t().z = .3;
   });
+
+  Key main_origin;
+  main_origin.Configure([&](Key& k) { k.SetPosition(0, 0, 24); });
 
   // Main keys. These are the keys for the ring - index fingers. Pinky and thumb are handled
   // separately.
   Key middle_1;
   middle_1.Configure([&](Key& k) {
     k.name = "middle_1";
-    k.t().z += 15;
+    k.SetParent(main_origin);
   });
 
   Key middle_2 = top_template;
@@ -69,6 +75,7 @@ int main() {
   middle_0.Configure([&](Key& k) {
     k.name = "middle_0";
     k.SetParent(middle_1);
+    // Feedback - pending - when adding key below this might be to high/slanted to get past.
   });
 
   Key index_1;
@@ -174,6 +181,9 @@ int main() {
     k.SetPosition(-1 * (kDefaultKeySpacing), 1.4, 1);
     k.t().ry = 4;
     k.t().x += .3;
+
+    // Feedback - Can move higher ~2mm
+    k.t().y += 2.5;
   });
 
   Key ring_outer_2 = top_template;
@@ -205,7 +215,7 @@ int main() {
   };
 
   std::vector<Key*> keys_to_print = {&middle_1, &middle_2, &middle_3};
-  //keys_to_print = main_keys;
+  // keys_to_print = main_keys;
 
   std::vector<Shape> shapes;
   for (Key* key : keys_to_print) {
@@ -217,7 +227,9 @@ int main() {
     }
   }
 
+  shapes.push_back(CreateCheapRaft(keys_to_print));
   UnionAll(shapes).WriteToFile("main.scad");
+
 
   // Print out distances between close keys.
   for (Key* key : main_keys) {
@@ -258,3 +270,59 @@ void DropWalls() {
   }
   */
 }
+
+// Create a square grid on the ground enclosing all the keys.
+Shape CreateCheapRaft(const std::vector<Key*> keys) {
+  std::vector<TransformList> points;
+  for (Key* k : keys) {
+  }
+
+  double left = 1000;
+  double right = -1000;
+  double top = -1000;
+  double bottom = 1000;
+
+  for (Key* k : keys) {
+    double k_left = std::min(k->GetTopLeft().Apply(kOrigin).x, k->GetBottomLeft().Apply(kOrigin).x);
+    double k_right =
+        std::max(k->GetTopRight().Apply(kOrigin).x, k->GetBottomRight().Apply(kOrigin).x);
+    double k_top = std::max(k->GetTopRight().Apply(kOrigin).y, k->GetTopLeft().Apply(kOrigin).y);
+    double k_bottom =
+        std::min(k->GetBottomRight().Apply(kOrigin).y, k->GetBottomLeft().Apply(kOrigin).y);
+
+    left = std::min(left, k_left);
+    right = std::max(right, k_right);
+    top = std::max(top, k_top);
+    bottom = std::min(bottom, k_bottom);
+  }
+
+  double step = 8;
+  double thick = 2;
+
+  double width = right - left;
+  double height = top - bottom;
+  Shape horizontal = Cube(width, thick, thick).TranslateZ(thick / 2).TranslateX(width / 2 + left);
+  Shape vertical = Cube(thick, height, thick).TranslateZ(thick / 2).TranslateY(height / 2 + bottom);
+
+  printf("b %f, l %f, r %f, t %f\n", bottom, left, right, top);
+  std::vector<Shape> shapes;
+  double y = top;
+  while (true) {
+    shapes.push_back(horizontal.TranslateY(y));
+    if (y < bottom) {
+      break;
+    }
+    y -= step;
+  }
+
+  double x = left;
+  while (true) {
+    shapes.push_back(vertical.TranslateX(x));
+    if (x > right) {
+      break;
+    }
+    x += step;
+  }
+  return UnionAll(shapes);
+}
+

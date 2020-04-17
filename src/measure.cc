@@ -1,12 +1,14 @@
 #include <functional>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <iostream>
 
 #include "util.h"
 
 using namespace scad;
+
+constexpr double kDefaultKeySpacing = 19;
 
 std::ostream& operator<<(std::ostream& out, const glm::vec3& vec) {
   out << "{" << vec.x << " " << vec.y << " " << vec.z << "}";
@@ -72,44 +74,99 @@ int main() {
   glm::vec3 p_ctrl(87.27, 9.95, 48.94);
   glm::vec3 p_alt(104.74, 4, 48.75);
 
-  Shape s = Sphere(1, 30);
+  Shape s = Sphere(1, 30).Color("red", 0.5);
 
+  Shape points = Union(s.Translate(p_backspace),
+                       s.Translate(p_delete),
+                       s.Translate(p_ctrl),
+                       s.Translate(p_alt),
 
-  Union(
-      s.Translate(p_backspace),
-      s.Translate(p_delete),
-      s.Translate(p_ctrl),
-      s.Translate(p_alt),
+                       s.Translate(p_plus),
+                       s.Translate(p_1),
+                       s.Translate(p_tab),
+                       s.Translate(p_caps),
+                       s.Translate(p_shift),
+                       s.Translate(p_q),
+                       s.Translate(p_a),
+                       s.Translate(p_z),
+                       s.Translate(p_tilda),
+                       s.Translate(p_slash),
 
-      s.Translate(p_plus),
-      s.Translate(p_1),
-      s.Translate(p_tab),
-      s.Translate(p_caps),
-      s.Translate(p_shift),
-      s.Translate(p_q),
-      s.Translate(p_a),
-      s.Translate(p_z),
-      s.Translate(p_tilda),
-      s.Translate(p_slash),
+                       s.Translate(p_2),
+                       s.Translate(p_w),
+                       s.Translate(p_s),
+                       s.Translate(p_x),
 
-      s.Translate(p_2),
-      s.Translate(p_w),
-      s.Translate(p_s),
-      s.Translate(p_x),
+                       s.Translate(p_5),
+                       s.Translate(p_t),
+                       s.Translate(p_g),
+                       s.Translate(p_b),
+                       s.Translate(p_e),
+                       s.Translate(p_c),
+                       s.Translate(p_v),
+                       s.Translate(p_r),
+                       s.Translate(p_left_arrow),
+                       s.Translate(p_right_arrow),
+                       s.Translate(p_3),
+                       s.Translate(p_4),
+                       s.Translate(p_d),
+                       s.Translate(p_f));
 
-      s.Translate(p_5),
-      s.Translate(p_t),
-      s.Translate(p_g),
-      s.Translate(p_b),
-      s.Translate(p_e),
-      s.Translate(p_c),
-      s.Translate(p_v),
-      s.Translate(p_r),
-      s.Translate(p_left_arrow),
-      s.Translate(p_right_arrow),
-      s.Translate(p_3),
-      s.Translate(p_4),
-      s.Translate(p_d).Color("green"),
-      s.Translate(p_f).Color("green")).WriteToFile("measure.scad");
+  Key thumb;
+  thumb.Configure([&](Key& k) {
+    k.name = "thumb";
+    k.SetPosition(60, -9.18, 42.83);
+  });
 
+  // Second thumb key.
+  Key thumb_delete;
+  thumb_delete.Configure([&](Key& k) {
+    k.name = "thumb_delete";
+    k.SetParent(thumb);
+    k.SetPosition(kDefaultKeySpacing, 0, 0);
+  });
+
+  // Bottom side key.
+  Key thumb_end;
+  thumb_end.Configure([&](Key& k) {
+    k.name = "thumb_end";
+    k.SetParent(thumb_delete);
+    k.SetPosition(kDefaultKeySpacing, -9, 0);
+  });
+
+  // Middle side key.
+  Key thumb_home;
+  thumb_home.Configure([&](Key& k) {
+    k.name = "thumb_home";
+    k.SetParent(thumb_delete);
+    k.SetPosition(kDefaultKeySpacing, 10, 0);
+  });
+
+  // Top side key;
+  Key thumb_alt;
+  thumb_alt.Configure([&](Key& k) {
+    k.name = "thumb_alt";
+    k.SetParent(thumb_delete);
+    k.SetPosition(kDefaultKeySpacing, 10 + kDefaultKeySpacing, 0);
+  });
+
+  // Top left key.
+  Key thumb_ctrl;
+  thumb_ctrl.Configure([&](Key& k) {
+    k.name = "thumb_ctrl";
+    k.SetParent(thumb_delete);
+    k.SetPosition(0, 10 + kDefaultKeySpacing, 0);
+  });
+
+  std::vector<Key*> thumb_keys = {
+      &thumb, &thumb_delete, &thumb_end, &thumb_home, &thumb_alt, &thumb_ctrl};
+
+  std::vector<Shape> shapes;
+  shapes.push_back(points);
+  Shape s2 = Sphere(1, 30).Color("blue", 0.5);
+  for (Key* key : keys_to_print) {
+    shapes.push_back(key->Apply(s2));
+  }
+
+  UnionAll(shapes).WriteToFile("measure.scad");
 }

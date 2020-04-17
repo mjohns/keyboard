@@ -146,6 +146,7 @@ struct CircleParams {
 };
 Shape SCAD_WARN_UNUSED_RESULT Circle(const CircleParams& params);
 Shape SCAD_WARN_UNUSED_RESULT Circle(double radius);
+Shape SCAD_WARN_UNUSED_RESULT Circle(double radius, double fn);
 
 struct CylinderParams {
   double h = 1;

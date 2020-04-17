@@ -20,24 +20,9 @@ constexpr double kFColumnRadius = 70;
 constexpr double kCapsColumnRadius = 60;
 
 // Rotates a key about the x axis until it has traveled the direct distance (not on the arc).
-Key GetRotatedKey(double distance, double radius, bool up) {
-  double rotation_direction = up ? 1.0 : -1.0;
-  double degrees = 1;
-  while (true) {
-    Key k;
-    k.local_transforms.TranslateZ(-1 * radius)
-        .RotateX(rotation_direction * degrees)
-        .TranslateZ(radius);
-    glm::vec3 point = k.GetTransforms().Apply(kOrigin);
-    float current_distance = glm::length(point);
-    if (current_distance > distance) {
-      return k;
-    }
-    degrees += .01;
-  }
-}
-
+Key GetRotatedKey(double distance, double radius, bool up);
 Shape GetPoints();
+Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid);
 
 int main() {
   // This is the parent of all keys. If you want to tilt the entire keyboard changes this.
@@ -315,15 +300,26 @@ int main() {
     k.SetParent(key_caps);
   });
 
-  std::vector<Key*> main_keys = {
-      &key_caps,       &key_tab, &key_plus, &key_shift,       &key_d, &key_e, &key_c,
-      &key_left_arrow, &key_3,   &key_s,    &key_w,           &key_2, &key_x, &key_slash,
-      &key_f,          &key_r,   &key_v,    &key_right_arrow, &key_4, &key_t, &key_5,
-      &key_b,          &key_g,   &key_a,    &key_q,           &key_1, &key_z, &key_tilda};
+  // 0 is the caps lock column, 0 is the number row.
+  // clang-format off
+  std::vector<std::vector<Key*>> key_grid = {
+    { &key_plus,   &key_1,      &key_2,      &key_3,           &key_4,            &key_5},
+    { &key_tab,    &key_q,      &key_w,      &key_e,           &key_r,            &key_t},
+    { &key_caps,   &key_a,      &key_s,      &key_d,           &key_f,            &key_g},
+    { &key_shift,  &key_z,      &key_x,      &key_c,           &key_v,            &key_b},
+    { nullptr,     &key_tilda,  &key_slash,  &key_left_arrow,  &key_right_arrow,  nullptr},
+  };
+  // clang-format on
 
   std::vector<Key*> keys_to_print;
   PushBackAll(&keys_to_print, thumb_keys);
-  PushBackAll(&keys_to_print, main_keys);
+  for (auto keys : key_grid) {
+    for (Key* key : keys) {
+      if (key != nullptr) {
+        keys_to_print.push_back(key);
+      }
+    }
+  }
   std::vector<Shape> shapes;
   if (kShowPoints) {
     shapes.push_back(GetPoints());
@@ -352,8 +348,75 @@ int main() {
   }
 
   shapes.push_back(Import("../things/points.stl").Color("red", 0.5));
+  shapes.push_back(ConnectMainKeys(key_grid));
   UnionAll(shapes).WriteToFile("measure.scad");
   UnionAll(golden_points).WriteToFile("points.scad");
+}
+
+Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
+  const int num_columns = 6;
+  const int num_rows = 5;
+
+  std::vector<Shape> shapes;
+  for (int r = 0; r < num_rows; ++r) {
+    printf("Connect row %d\n", r);
+    std::vector<Key*> keys = key_grid[r];
+    bool has_top_keys = false;
+    std::vector<Key*> top_keys;
+    if (r > 0) {
+      has_top_keys = true;
+      top_keys = key_grid[r - 1];
+    }
+    for (int c = 0; c < num_columns; ++c) {
+      printf("Connect column %d\n", c);
+      Key* key = keys[c];
+      if (key == nullptr) {
+        // No key at this location.
+        continue;
+      }
+      Key* left = nullptr;
+      if (c > 0) {
+        left = keys[c - 1];
+      }
+
+      Key* top_left = nullptr;
+      Key* top = nullptr;
+      if (has_top_keys) {
+        top = top_keys[c];
+        if (c > 0) {
+          top_left = top_keys[c - 1];
+        }
+      }
+
+      if (left != nullptr) {
+        shapes.push_back(ConnectHorizontal(*left, *key));
+      }
+      if (top != nullptr) {
+        shapes.push_back(ConnectVertical(*top, *key));
+        if (left != nullptr && top_left != nullptr) {
+          shapes.push_back(ConnectDiagonal(*top_left, *top, *key, *left));
+        }
+      }
+    }
+  }
+  return UnionAll(shapes);
+}
+
+Key GetRotatedKey(double distance, double radius, bool up) {
+  double rotation_direction = up ? 1.0 : -1.0;
+  double degrees = 1;
+  while (true) {
+    Key k;
+    k.local_transforms.TranslateZ(-1 * radius)
+        .RotateX(rotation_direction * degrees)
+        .TranslateZ(radius);
+    glm::vec3 point = k.GetTransforms().Apply(kOrigin);
+    float current_distance = glm::length(point);
+    if (current_distance > distance) {
+      return k;
+    }
+    degrees += .01;
+  }
 }
 
 Shape GetPoints() {

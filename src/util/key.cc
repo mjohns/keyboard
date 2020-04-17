@@ -239,6 +239,14 @@ Shape Key::GetCap(bool fill_in_cap_path) const {
     Shape bottom = cap.Projection().LinearExtrude(6).TranslateZ(-3 - cap_height);
     cap = cap.Add(bottom);
   }
+
+  if (disable_switch_z_offset) {
+    // Need to move the cap up since the transforms are measured at the switch top.
+    double switch_z_offset = type == KeyType::DSA ? kDsaSwitchZOffset : kSaSwitchZOffset;
+    TransformList transforms;
+    transforms.AddTransform().z = switch_z_offset;
+    return transforms.Append(GetTransforms()).Apply(cap);
+  }
   return GetTransforms().Apply(cap);
 }
 

@@ -7,7 +7,7 @@
 
 using namespace scad;
 
-constexpr bool kShowPoints = true;
+constexpr bool kShowPoints = false;
 
 constexpr double kDefaultKeySpacing = 19;
 constexpr double kBowlKeySpacing = 18;
@@ -43,7 +43,10 @@ int main() {
   // This is the parent of all keys. If you want to tilt the entire keyboard changes this.
   Key key_origin;
 
+  //
   // Thumb keys
+  //
+
   Key thumb;
   thumb.Configure([&](Key& k) {
     k.name = "thumb";
@@ -97,9 +100,11 @@ int main() {
   std::vector<Key*> thumb_keys = {
       &thumb, &thumb_delete, &thumb_end, &thumb_home, &thumb_alt, &thumb_ctrl};
 
+  //
   // Main bowl keys
+  //
 
-  // D column - this is the column that all others in the bowl are relative to
+  // D column - this is the column that all others in the bowl are relative to.
   Key key_d;
   key_d.Configure([&](Key& k) {
     k.name = "d";
@@ -137,8 +142,14 @@ int main() {
   Key key_s;
   key_s.Configure([&](Key& k) {
     k.name = "s";
-    k.SetPosition(6.09, 50.23, 18.05);
-    k.t().ry = -10;
+
+    // Absolute:
+    // k.SetPosition(6.09, 50.23, 18.05);
+    // k.t().ry = -10;
+
+    k.SetParent(key_d);
+    k.SetPosition(-19.571, -0.090, 5.430);
+    k.t().ry = 5;
   });
 
   Key key_w = GetRotatedKey(kBowlKeySpacing, kSColumnRadius, true);
@@ -169,8 +180,14 @@ int main() {
   Key key_f;
   key_f.Configure([&](Key& k) {
     k.name = "f";
-    k.SetPosition(44.3, 49.37, 28.1);
-    k.t().ry = -20;
+
+    // Absolute:
+    // k.SetPosition(44.3, 49.37, 28.1);
+    // k.t().ry = -20;
+
+    k.SetParent(key_d);
+    k.SetPosition(19.938, -0.950, 5.249);
+    k.t().ry = -5;
   });
 
   Key key_r = GetRotatedKey(kBowlKeySpacing, kFColumnRadius, true);
@@ -201,8 +218,14 @@ int main() {
   Key key_g;
   key_g.Configure([&](Key& k) {
     k.name = "g";
-    k.SetPosition(60.16, 48.06, 37.39);
-    k.t().ry = -30;
+
+    // Absolute:
+    // k.SetPosition(60.16, 48.06, 37.39);
+    // k.t().ry = -30;
+
+    k.SetParent(key_f);
+    k.SetPosition(18.081, -1.310, 3.305);
+    k.t().ry = -10;
   });
 
   Key key_t = GetRotatedKey(kBowlKeySpacing, kGColumnRadius, true);
@@ -227,8 +250,13 @@ int main() {
   Key key_a;
   key_a.Configure([&](Key& k) {
     k.name = "a";
-    k.SetPosition(-15.41, 44.06, 19.7);
-    k.t().ry = -10;
+
+    // Absolute:
+    // k.SetPosition(-15.41, 44.06, 19.7);
+    // k.t().ry = -10;
+
+    k.SetParent(key_s);
+    k.SetPosition(-20.887, -6.170, 5.358);
   });
 
   Key key_q = GetRotatedKey(kBowlKeySpacing, kAColumnRadius, true);
@@ -259,8 +287,14 @@ int main() {
   Key key_caps;
   key_caps.Configure([&](Key& k) {
     k.name = "caps";
-    k.SetPosition(-37.7, 48.06, 15.98);
-    k.t().ry = -5;
+
+    // Absolute:
+    // k.SetPosition(-37.7, 48.06, 15.98);
+    // k.t().ry = -5;
+
+    k.SetParent(key_a);
+    k.SetPosition(-22.597, 4.000, 0.207);
+    k.t().ry = 5;
   });
 
   Key key_tab = GetRotatedKey(kBowlKeySpacing, kCapsColumnRadius, true);
@@ -296,13 +330,17 @@ int main() {
   }
   Shape s2 = Sphere(1, 30).Color("blue", 0.5);
 
+  std::vector<Shape> golden_points;
   // Keys are measured from the tip of the switch and keys are measured from the tip of the cap.
   // amount.
   double switch_top_z_offset = 10;
   for (Key* key : keys_to_print) {
+    Shape key_point = key->GetTransforms().Apply(s2);
+    golden_points.push_back(key_point);
     if (kShowPoints) {
-      shapes.push_back(key->GetTransforms().Apply(s2));
+      shapes.push_back(key_point);
     }
+    shapes.push_back(key_point);
 
     key->AddTransform();
     key->t().z -= 10;
@@ -313,7 +351,9 @@ int main() {
     // shapes.push_back(key->GetCap());
   }
 
+  shapes.push_back(Import("../things/points.stl").Color("red", 0.5));
   UnionAll(shapes).WriteToFile("measure.scad");
+  UnionAll(golden_points).WriteToFile("points.scad");
 }
 
 Shape GetPoints() {
@@ -441,4 +481,17 @@ for (int i = 0; i < 5; ++i) {
   r += 5;
 }
  UnionAll(arcs).WriteToFile("measure.scad");
+*/
+
+/*
+Key base;
+base.t().ry = 10;
+Key other;
+other.Configure([&](Key& k) {
+  k.SetParent(base);
+  k.SetPosition(-22.29, 4, -3.72);
+});
+
+glm::vec3 rel = other.GetTransforms().Apply(kOrigin);
+printf("k.SetPosition(%.3f, %.3f, %.3f);\n", rel.x, rel.y, rel.z);
 */

@@ -332,10 +332,19 @@ int main() {
   }
   Shape s2 = Sphere(1, 30).Color("blue", 0.5);
 
+  std::vector<Key*> left_wall_keys = {&key_plus, &key_tab, &key_caps, &key_shift};
+  std::vector<Key*> right_wall_keys = {&key_5, &key_t, &key_g, &key_b};
+
   // Adjust the switch widths.
 
   for (Key* key : key_grid[0]) {
     key->extra_height_top = 2;
+  }
+  for (Key* key : left_wall_keys) {
+    key->extra_width_left = 8;
+  }
+  for (Key* key : right_wall_keys) {
+    key->extra_width_right = 8;
   }
 
   std::vector<Shape> golden_points;
@@ -362,15 +371,46 @@ int main() {
   shapes.push_back(Import("../things/points.stl").Color("red", 0.5));
   shapes.push_back(ConnectMainKeys(key_grid));
 
-  // This must be in clockwise order.
-  std::vector<WallPiece> wall_pieces = {
-    {&key_plus, WallDirection::TOP},
-    {&key_1, WallDirection::TOP},
-    {&key_2, WallDirection::TOP},
-    {&key_3, WallDirection::TOP},
-  };
+  double wall_connector_offset = -2;
+  std::vector<TransformList> right_wall_points = {
+      key_5.GetTopRight(wall_connector_offset),
+      key_5.GetBottomRight(wall_connector_offset),
 
-  shapes.push_back(MakeTopWall(key_grid[0]));
+      key_t.GetTopRight(wall_connector_offset),
+      key_t.GetBottomRight(wall_connector_offset),
+
+      key_g.GetTopRight(wall_connector_offset),
+      key_g.GetBottomRight(wall_connector_offset),
+
+      key_b.GetTopRight(wall_connector_offset),
+      key_b.GetBottomRight(wall_connector_offset),
+  };
+  std::vector<TransformList> left_wall_points = {
+      key_plus.GetTopLeft(wall_connector_offset),
+      key_plus.GetBottomLeft(wall_connector_offset),
+
+      key_tab.GetTopLeft(wall_connector_offset),
+      key_tab.GetBottomLeft(wall_connector_offset),
+
+      key_caps.GetTopLeft(wall_connector_offset),
+      key_caps.GetBottomLeft(wall_connector_offset),
+
+      key_shift.GetTopLeft(wall_connector_offset),
+      key_shift.GetBottomLeft(wall_connector_offset),
+  };
+  auto get_wall_post = [](TransformList t) {
+    Shape s = t.Apply(Cube(4).TranslateZ(-2));
+    return Hull(s, s.Projection().LinearExtrude(.01));
+  };
+  for (size_t i = 0; i < left_wall_points.size() - 1; ++i) {
+    shapes.push_back(
+        Hull(get_wall_post(left_wall_points[i]), get_wall_post(left_wall_points[i + 1])));
+  }
+  for (size_t i = 0; i < right_wall_points.size() - 1; ++i) {
+    shapes.push_back(
+        Hull(get_wall_post(right_wall_points[i]), get_wall_post(right_wall_points[i + 1])));
+  }
+
   UnionAll(shapes).WriteToFile("measure.scad");
   UnionAll(golden_points).WriteToFile("points.scad");
 }
@@ -408,40 +448,15 @@ Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
       }
 
       if (left != nullptr) {
-        shapes.push_back(ConnectHorizontal(*left, *key));
+        shapes.push_back(ConnectHorizontal(*left, *key, GetCapsuleConnector(), -1));
       }
       if (top != nullptr) {
         shapes.push_back(ConnectVertical(*top, *key));
         if (left != nullptr && top_left != nullptr) {
-          shapes.push_back(ConnectDiagonal(*top_left, *top, *key, *left));
+          shapes.push_back(ConnectDiagonal(*top_left, *top, *key, *left, GetCapsuleConnector(), -1));
         }
       }
     }
-  }
-  return UnionAll(shapes);
-}
-
-Shape MakeTopWall(const std::vector<Key*>& keys) {
-  Shape last_post;
-  std::vector<Shape> shapes;
-  for (size_t i = 0; i < keys.size(); ++i) {
-    Key* key = keys[i];
-
-    Shape s = Sphere(.5, 20).TranslateZ(-.5 + 4);
-    Shape first_point = Hull(s, s.Projection().LinearExtrude(.01));
-
-
-//    Shape first_point = Sphere(.5, 20).Translatz(0, -2, -5);
-    Shape second_point = Cube(0.1, 0.1, 4).RotateX(-45).Translate(0, 5, -15);
-    Shape first_segment = Hull(first_point, second_point);
-    Shape left_post = key->GetTopLeft().Apply(first_segment);
-    Shape right_post = key->GetTopRight().Apply(first_segment);
-
-    if (i > 0) {
-      shapes.push_back(Hull(last_post, left_post));
-    }
-    shapes.push_back(Hull(left_post, right_post));
-    last_post = right_post;
   }
   return UnionAll(shapes);
 }

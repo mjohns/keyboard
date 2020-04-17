@@ -116,6 +116,9 @@ int main() {
   thumb.Configure([&](Key& k) {
     k.name = "thumb";
     k.SetPosition(60, -9.18, 42.83);
+    k.t().rz = -21;
+    k.t().rx = 12;
+    k.t().ry = -4.5;
   });
 
   // Second thumb key.
@@ -161,11 +164,12 @@ int main() {
   std::vector<Key*> thumb_keys = {
       &thumb, &thumb_delete, &thumb_end, &thumb_home, &thumb_alt, &thumb_ctrl};
 
+  std::vector<Key*> keys_to_print = thumb_keys;
   std::vector<Shape> shapes;
   shapes.push_back(points);
   Shape s2 = Sphere(1, 30).Color("blue", 0.5);
   for (Key* key : keys_to_print) {
-    shapes.push_back(key->Apply(s2));
+    shapes.push_back(key->GetTransforms().Apply(s2));
   }
 
   UnionAll(shapes).WriteToFile("measure.scad");

@@ -12,6 +12,9 @@ constexpr bool kShowPoints = false;
 constexpr double kDefaultKeySpacing = 19;
 constexpr double kBowlKeySpacing = 18;
 
+constexpr int kNumColumns = 6;
+constexpr int kNumRows = 5;
+
 constexpr double kDColumnRadius = 55;
 constexpr double kAColumnRadius = 70;
 constexpr double kSColumnRadius = 65;
@@ -20,9 +23,16 @@ constexpr double kFColumnRadius = 70;
 constexpr double kCapsColumnRadius = 60;
 
 // Rotates a key about the x axis until it has traveled the direct distance (not on the arc).
-Key GetRotatedKey(double distance, double radius, bool up);
+Key GetRotatedKey(double radius, bool up);
 Shape GetPoints();
 Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid);
+
+enum class WallDirection { LEFT, RIGHT, TOP, BOTTOM };
+struct WallPiece {
+  Key* key;
+  WallDirection direction;
+};
+Shape MakeWall(const std::vector<WallPiece>& pieces);
 
 int main() {
   // This is the parent of all keys. If you want to tilt the entire keyboard changes this.
@@ -98,26 +108,26 @@ int main() {
     k.t().ry = -15;
   });
 
-  Key key_e = GetRotatedKey(kBowlKeySpacing, kDColumnRadius, true);
+  Key key_e = GetRotatedKey(kDColumnRadius, true);
   key_e.Configure([&](Key& k) {
     k.name = "e";
     k.SetParent(key_d);
   });
 
   // This key is rotated more than the others in the column.
-  Key key_3 = GetRotatedKey(kBowlKeySpacing, 50, true);
+  Key key_3 = GetRotatedKey(50, true);
   key_3.Configure([&](Key& k) {
     k.name = "3";
     k.SetParent(key_e);
   });
 
-  Key key_c = GetRotatedKey(kBowlKeySpacing, kDColumnRadius, false);
+  Key key_c = GetRotatedKey(kDColumnRadius, false);
   key_c.Configure([&](Key& k) {
     k.name = "c";
     k.SetParent(key_d);
   });
 
-  Key key_left_arrow = GetRotatedKey(kBowlKeySpacing, kDColumnRadius, false);
+  Key key_left_arrow = GetRotatedKey(kDColumnRadius, false);
   key_left_arrow.Configure([&](Key& k) {
     k.name = "left_arrow";
     k.SetParent(key_c);
@@ -137,25 +147,25 @@ int main() {
     k.t().ry = 5;
   });
 
-  Key key_w = GetRotatedKey(kBowlKeySpacing, kSColumnRadius, true);
+  Key key_w = GetRotatedKey(kSColumnRadius, true);
   key_w.Configure([&](Key& k) {
     k.name = "w";
     k.SetParent(key_s);
   });
 
-  Key key_2 = GetRotatedKey(kBowlKeySpacing, kSColumnRadius, true);
+  Key key_2 = GetRotatedKey(kSColumnRadius, true);
   key_2.Configure([&](Key& k) {
     k.name = "2";
     k.SetParent(key_w);
   });
 
-  Key key_x = GetRotatedKey(kBowlKeySpacing, kSColumnRadius, false);
+  Key key_x = GetRotatedKey(kSColumnRadius, false);
   key_x.Configure([&](Key& k) {
     k.name = "x";
     k.SetParent(key_s);
   });
 
-  Key key_slash = GetRotatedKey(kBowlKeySpacing, kSColumnRadius, false);
+  Key key_slash = GetRotatedKey(kSColumnRadius, false);
   key_slash.Configure([&](Key& k) {
     k.name = "slash";
     k.SetParent(key_x);
@@ -175,25 +185,25 @@ int main() {
     k.t().ry = -5;
   });
 
-  Key key_r = GetRotatedKey(kBowlKeySpacing, kFColumnRadius, true);
+  Key key_r = GetRotatedKey(kFColumnRadius, true);
   key_r.Configure([&](Key& k) {
     k.name = "r";
     k.SetParent(key_f);
   });
 
-  Key key_4 = GetRotatedKey(kBowlKeySpacing, kFColumnRadius, true);
+  Key key_4 = GetRotatedKey(kFColumnRadius, true);
   key_4.Configure([&](Key& k) {
     k.name = "4";
     k.SetParent(key_r);
   });
 
-  Key key_v = GetRotatedKey(kBowlKeySpacing, kFColumnRadius, false);
+  Key key_v = GetRotatedKey(kFColumnRadius, false);
   key_v.Configure([&](Key& k) {
     k.name = "v";
     k.SetParent(key_f);
   });
 
-  Key key_right_arrow = GetRotatedKey(kBowlKeySpacing, kFColumnRadius, false);
+  Key key_right_arrow = GetRotatedKey(kFColumnRadius, false);
   key_right_arrow.Configure([&](Key& k) {
     k.name = "right_arrow";
     k.SetParent(key_v);
@@ -213,19 +223,19 @@ int main() {
     k.t().ry = -10;
   });
 
-  Key key_t = GetRotatedKey(kBowlKeySpacing, kGColumnRadius, true);
+  Key key_t = GetRotatedKey(kGColumnRadius, true);
   key_t.Configure([&](Key& k) {
     k.name = "t";
     k.SetParent(key_g);
   });
 
-  Key key_5 = GetRotatedKey(kBowlKeySpacing, kGColumnRadius, true);
+  Key key_5 = GetRotatedKey(kGColumnRadius, true);
   key_5.Configure([&](Key& k) {
     k.name = "5";
     k.SetParent(key_t);
   });
 
-  Key key_b = GetRotatedKey(kBowlKeySpacing, kGColumnRadius, false);
+  Key key_b = GetRotatedKey(kGColumnRadius, false);
   key_b.Configure([&](Key& k) {
     k.name = "b";
     k.SetParent(key_g);
@@ -244,25 +254,25 @@ int main() {
     k.SetPosition(-20.887, -6.170, 5.358);
   });
 
-  Key key_q = GetRotatedKey(kBowlKeySpacing, kAColumnRadius, true);
+  Key key_q = GetRotatedKey(kAColumnRadius, true);
   key_q.Configure([&](Key& k) {
     k.name = "q";
     k.SetParent(key_a);
   });
 
-  Key key_1 = GetRotatedKey(kBowlKeySpacing, kAColumnRadius, true);
+  Key key_1 = GetRotatedKey(kAColumnRadius, true);
   key_1.Configure([&](Key& k) {
     k.name = "1";
     k.SetParent(key_q);
   });
 
-  Key key_z = GetRotatedKey(kBowlKeySpacing, kAColumnRadius, false);
+  Key key_z = GetRotatedKey(kAColumnRadius, false);
   key_z.Configure([&](Key& k) {
     k.name = "z";
     k.SetParent(key_a);
   });
 
-  Key key_tilda = GetRotatedKey(kBowlKeySpacing, kAColumnRadius, false);
+  Key key_tilda = GetRotatedKey(kAColumnRadius, false);
   key_tilda.Configure([&](Key& k) {
     k.name = "tilda";
     k.SetParent(key_z);
@@ -282,19 +292,19 @@ int main() {
     k.t().ry = 5;
   });
 
-  Key key_tab = GetRotatedKey(kBowlKeySpacing, kCapsColumnRadius, true);
+  Key key_tab = GetRotatedKey(kCapsColumnRadius, true);
   key_tab.Configure([&](Key& k) {
     k.name = "tab";
     k.SetParent(key_caps);
   });
 
-  Key key_plus = GetRotatedKey(kBowlKeySpacing, kCapsColumnRadius, true);
+  Key key_plus = GetRotatedKey(kCapsColumnRadius, true);
   key_plus.Configure([&](Key& k) {
     k.name = "plus";
     k.SetParent(key_tab);
   });
 
-  Key key_shift = GetRotatedKey(kBowlKeySpacing, kCapsColumnRadius, false);
+  Key key_shift = GetRotatedKey(kCapsColumnRadius, false);
   key_shift.Configure([&](Key& k) {
     k.name = "shift";
     k.SetParent(key_caps);
@@ -326,6 +336,12 @@ int main() {
   }
   Shape s2 = Sphere(1, 30).Color("blue", 0.5);
 
+  // Adjust the switch widths.
+
+  for (Key* key : key_grid[0]) {
+    key->extra_height_top = 4;
+  }
+
   std::vector<Shape> golden_points;
   // Keys are measured from the tip of the switch and keys are measured from the tip of the cap.
   // amount.
@@ -349,16 +365,22 @@ int main() {
 
   shapes.push_back(Import("../things/points.stl").Color("red", 0.5));
   shapes.push_back(ConnectMainKeys(key_grid));
+
+  // This must be in clockwise order.
+  std::vector<WallPiece> wall_pieces = {
+    {&key_plus, WallDirection::TOP},
+    {&key_1, WallDirection::TOP},
+    {&key_2, WallDirection::TOP},
+    {&key_3, WallDirection::TOP},
+  };
+  shapes.push_back(MakeWall(wall_pieces));
   UnionAll(shapes).WriteToFile("measure.scad");
   UnionAll(golden_points).WriteToFile("points.scad");
 }
 
 Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
-  const int num_columns = 6;
-  const int num_rows = 5;
-
   std::vector<Shape> shapes;
-  for (int r = 0; r < num_rows; ++r) {
+  for (int r = 0; r < kNumRows; ++r) {
     printf("Connect row %d\n", r);
     std::vector<Key*> keys = key_grid[r];
     bool has_top_keys = false;
@@ -367,7 +389,7 @@ Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
       has_top_keys = true;
       top_keys = key_grid[r - 1];
     }
-    for (int c = 0; c < num_columns; ++c) {
+    for (int c = 0; c < kNumColumns; ++c) {
       printf("Connect column %d\n", c);
       Key* key = keys[c];
       if (key == nullptr) {
@@ -402,9 +424,50 @@ Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
   return UnionAll(shapes);
 }
 
-Key GetRotatedKey(double distance, double radius, bool up) {
+Shape MakeWall(const std::vector<WallPiece>& pieces) {
+  Shape last_post;
+  std::vector<Shape> shapes;
+  for (size_t i = 0; i < pieces.size(); ++i) {
+    WallPiece piece = pieces[i];
+
+    Shape first_point = Cube(.1, 4, 2).Translate(0, -2, -5);
+    Shape second_point = Cube(0.1, 0.1, 4).RotateX(-45).Translate(0, 5, -15);
+    Shape first_segment = Hull(first_point, second_point);
+    Shape left_post = piece.key->GetTopLeft().Apply(first_segment);
+    Shape right_post = piece.key->GetTopRight().Apply(first_segment);
+
+    if (i > 0) {
+      shapes.push_back(Hull(last_post, left_post));
+    }
+    shapes.push_back(Hull(left_post, right_post));
+    last_post = right_post;
+  }
+  return UnionAll(shapes);
+}
+
+Key GetRotatedKey(double radius, bool up) {
+  double distance = kBowlKeySpacing;
   double rotation_direction = up ? 1.0 : -1.0;
   double degrees = 1;
+
+  // Use precomputed numbers for known radiuses to speed up execution.
+  if (radius == 50) {
+    degrees = 20.740;
+  }
+  if (radius == 55) {
+    degrees = 18.840;
+  }
+  if (radius == 60) {
+    degrees = 17.26;
+  }
+  if (radius == 65) {
+    degrees = 15.920;
+  }
+  if (radius == 70) {
+    degrees = 14.780;
+  }
+
+  bool is_first = true;
   while (true) {
     Key k;
     k.local_transforms.TranslateZ(-1 * radius)
@@ -413,9 +476,13 @@ Key GetRotatedKey(double distance, double radius, bool up) {
     glm::vec3 point = k.GetTransforms().Apply(kOrigin);
     float current_distance = glm::length(point);
     if (current_distance > distance) {
+      if (!is_first) {
+        printf("Cumputed degrees %.3f for radius %.3f\n", degrees, radius);
+      }
       return k;
     }
     degrees += .01;
+    is_first = false;
   }
 }
 

@@ -438,7 +438,7 @@ int main() {
         th2.GetBottomRight(),   th3.GetBottomLeft(), th3.GetBottomRight(), th3.GetTopRight(),
         th3_t.GetBottomRight(), th3_t.GetTopRight(), th2_t.GetTopRight(),  b0.GetTopRight(),
         m0.GetBottomRight(),    m0.GetTopRight(),    t0.GetBottomRight(),  t0.GetTopRight(),
-        tt0.GetBottomRight(), tt0.GetTopRight(),
+        tt0.GetBottomRight(),   tt0.GetTopRight(),
     };
     auto get_post = [](TransformList t) {
       Shape s = t.Apply(Connector());

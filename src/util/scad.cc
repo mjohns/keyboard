@@ -160,6 +160,13 @@ Shape Circle(double radius) {
   return Circle(params);
 }
 
+Shape Circle(double radius, double fn) {
+  CircleParams params;
+  params.r = radius;
+  params.fn = fn;
+  return Circle(params);
+}
+
 Shape Cylinder(const CylinderParams& params) {
   return Shape::Primitive([=](std::FILE* file) {
     fprintf(file,

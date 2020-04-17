@@ -10,6 +10,7 @@ using namespace scad;
 constexpr bool kShowPoints = false;
 
 constexpr double kDefaultKeySpacing = 19;
+// The direct distance between switch tops in the bowl.
 constexpr double kBowlKeySpacing = 18;
 
 constexpr int kNumColumns = 6;
@@ -27,12 +28,7 @@ Key GetRotatedKey(double radius, bool up);
 Shape GetPoints();
 Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid);
 
-enum class WallDirection { LEFT, RIGHT, TOP, BOTTOM };
-struct WallPiece {
-  Key* key;
-  WallDirection direction;
-};
-Shape MakeWall(const std::vector<WallPiece>& pieces);
+Shape MakeTopWall(const std::vector<Key*>& keys);
 
 int main() {
   // This is the parent of all keys. If you want to tilt the entire keyboard changes this.
@@ -339,7 +335,7 @@ int main() {
   // Adjust the switch widths.
 
   for (Key* key : key_grid[0]) {
-    key->extra_height_top = 4;
+    key->extra_height_top = 2;
   }
 
   std::vector<Shape> golden_points;
@@ -373,7 +369,8 @@ int main() {
     {&key_2, WallDirection::TOP},
     {&key_3, WallDirection::TOP},
   };
-  shapes.push_back(MakeWall(wall_pieces));
+
+  shapes.push_back(MakeTopWall(key_grid[0]));
   UnionAll(shapes).WriteToFile("measure.scad");
   UnionAll(golden_points).WriteToFile("points.scad");
 }
@@ -424,17 +421,21 @@ Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
   return UnionAll(shapes);
 }
 
-Shape MakeWall(const std::vector<WallPiece>& pieces) {
+Shape MakeTopWall(const std::vector<Key*>& keys) {
   Shape last_post;
   std::vector<Shape> shapes;
-  for (size_t i = 0; i < pieces.size(); ++i) {
-    WallPiece piece = pieces[i];
+  for (size_t i = 0; i < keys.size(); ++i) {
+    Key* key = keys[i];
 
-    Shape first_point = Cube(.1, 4, 2).Translate(0, -2, -5);
+    Shape s = Sphere(.5, 20).TranslateZ(-.5 + 4);
+    Shape first_point = Hull(s, s.Projection().LinearExtrude(.01));
+
+
+//    Shape first_point = Sphere(.5, 20).Translatz(0, -2, -5);
     Shape second_point = Cube(0.1, 0.1, 4).RotateX(-45).Translate(0, 5, -15);
     Shape first_segment = Hull(first_point, second_point);
-    Shape left_post = piece.key->GetTopLeft().Apply(first_segment);
-    Shape right_post = piece.key->GetTopRight().Apply(first_segment);
+    Shape left_post = key->GetTopLeft().Apply(first_segment);
+    Shape right_post = key->GetTopRight().Apply(first_segment);
 
     if (i > 0) {
       shapes.push_back(Hull(last_post, left_post));

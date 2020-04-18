@@ -23,5 +23,11 @@ if [ ! -f scad.o ]; then
 	fi
 fi
 
-echo "Building $1"
-g++ -std=c++17 ../src/$1.cc *.o -I../src/util -I../src/glm/v0.9.9.2 -o $1 && ./$1 && echo "Done"
+echo "Building \"$1\""
+g++ -std=c++17 ../src/$1.cc *.o -I../src/util -I../src/glm/v0.9.9.2 -o $1
+if [ $? -ne 0 ]; then
+  echo "Failed to build"
+  exit 1
+fi
+echo "Running"
+./$1 && echo "Done"

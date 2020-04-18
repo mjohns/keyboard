@@ -176,6 +176,15 @@ Shape Key::GetInverseSwitch() const {
   return Hull(s).Subtract(s);
 }
 
+Shape Key::GetInverseCap(double custom_vertical_length) const {
+  double width = kDsaBottomSize + .1;
+  double height = width;
+  if (custom_vertical_length > 0) {
+    height = custom_vertical_length;
+  }
+  return Cube(width, height, 30).TranslateZ(15);
+}
+
 Shape Key::GetSwitch() const {
   std::vector<Shape> shapes;
   if (extra_z > 0) {

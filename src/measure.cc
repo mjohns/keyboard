@@ -30,9 +30,19 @@ Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid);
 
 Shape MakeTopWall(const std::vector<Key*>& keys);
 
+std::vector<Key*> GetColumn(const std::vector<std::vector<Key*>>& key_grid, int c) {
+  std::vector<Key*> result;
+  for (int r = 0; r < kNumRows; ++r) {
+    Key* key = key_grid[r][c];
+    result.push_back(key);
+  }
+  return result;
+}
+
 int main() {
   // This is the parent of all keys. If you want to tilt the entire keyboard changes this.
   Key key_origin;
+  key_origin.Configure([&](Key& k) { k.SetPosition(0, 0, 10); });
 
   //
   // Thumb keys
@@ -95,7 +105,8 @@ int main() {
   // Main bowl keys
   //
 
-  // D column - this is the column that all others in the bowl are relative to.
+  // All keys in the dish are relative to d and then based off of their associated key in the home
+  // row.
   Key key_d;
   key_d.Configure([&](Key& k) {
     k.name = "d";
@@ -104,6 +115,72 @@ int main() {
     k.t().ry = -15;
   });
 
+  Key key_f;
+  key_f.Configure([&](Key& k) {
+    k.name = "f";
+
+    // Absolute:
+    // k.SetPosition(44.3, 49.37, 28.1);
+    // k.t().ry = -20;
+
+    k.SetParent(key_d);
+    k.SetPosition(19.938, -0.950, 5.249);
+    k.t().ry = -5;
+  });
+
+  Key key_g;
+  key_g.Configure([&](Key& k) {
+    k.name = "g";
+
+    // Absolute:
+    // k.SetPosition(60.16, 48.06, 37.39);
+    // k.t().ry = -30;
+
+    k.SetParent(key_f);
+    k.SetPosition(18.081, -1.310, 3.305);
+    k.SetPosition(18.481, -1.310, 3.305);
+    k.t().ry = -10;
+  });
+
+  Key key_s;
+  key_s.Configure([&](Key& k) {
+    k.name = "s";
+
+    // Absolute:
+    // k.SetPosition(6.09, 50.23, 18.05);
+    // k.t().ry = -10;
+
+    k.SetParent(key_d);
+    k.SetPosition(-19.571, -0.090, 5.430);
+    k.t().ry = 5;
+  });
+
+  Key key_a;
+  key_a.Configure([&](Key& k) {
+    k.name = "a";
+
+    // Absolute:
+    // k.SetPosition(-15.41, 44.06, 19.7);
+    // k.t().ry = -10;
+
+    k.SetParent(key_s);
+    k.SetPosition(-20.887, -6.170, 5.358);
+  });
+
+  Key key_caps;
+  key_caps.Configure([&](Key& k) {
+    k.name = "caps";
+
+    // Absolute:
+    // k.SetPosition(-37.7, 48.06, 15.98);
+    // k.t().ry = -5;
+
+    k.SetParent(key_a);
+    k.SetPosition(-22.597, 4.000, 0.207);
+    k.t().ry = 5;
+  });
+
+  // D Column
   Key key_e = GetRotatedKey(kDColumnRadius, true);
   key_e.Configure([&](Key& k) {
     k.name = "e";
@@ -130,19 +207,6 @@ int main() {
   });
 
   // S column
-  Key key_s;
-  key_s.Configure([&](Key& k) {
-    k.name = "s";
-
-    // Absolute:
-    // k.SetPosition(6.09, 50.23, 18.05);
-    // k.t().ry = -10;
-
-    k.SetParent(key_d);
-    k.SetPosition(-19.571, -0.090, 5.430);
-    k.t().ry = 5;
-  });
-
   Key key_w = GetRotatedKey(kSColumnRadius, true);
   key_w.Configure([&](Key& k) {
     k.name = "w";
@@ -168,19 +232,6 @@ int main() {
   });
 
   // F column
-  Key key_f;
-  key_f.Configure([&](Key& k) {
-    k.name = "f";
-
-    // Absolute:
-    // k.SetPosition(44.3, 49.37, 28.1);
-    // k.t().ry = -20;
-
-    k.SetParent(key_d);
-    k.SetPosition(19.938, -0.950, 5.249);
-    k.t().ry = -5;
-  });
-
   Key key_r = GetRotatedKey(kFColumnRadius, true);
   key_r.Configure([&](Key& k) {
     k.name = "r";
@@ -205,20 +256,6 @@ int main() {
     k.SetParent(key_v);
   });
 
-  // G column
-  Key key_g;
-  key_g.Configure([&](Key& k) {
-    k.name = "g";
-
-    // Absolute:
-    // k.SetPosition(60.16, 48.06, 37.39);
-    // k.t().ry = -30;
-
-    k.SetParent(key_f);
-    k.SetPosition(18.081, -1.310, 3.305);
-    k.t().ry = -10;
-  });
-
   Key key_t = GetRotatedKey(kGColumnRadius, true);
   key_t.Configure([&](Key& k) {
     k.name = "t";
@@ -229,6 +266,8 @@ int main() {
   key_5.Configure([&](Key& k) {
     k.name = "5";
     k.SetParent(key_t);
+    // 5 hits 4 a little.
+    k.t().x = 1.2;
   });
 
   Key key_b = GetRotatedKey(kGColumnRadius, false);
@@ -238,18 +277,6 @@ int main() {
   });
 
   // A column
-  Key key_a;
-  key_a.Configure([&](Key& k) {
-    k.name = "a";
-
-    // Absolute:
-    // k.SetPosition(-15.41, 44.06, 19.7);
-    // k.t().ry = -10;
-
-    k.SetParent(key_s);
-    k.SetPosition(-20.887, -6.170, 5.358);
-  });
-
   Key key_q = GetRotatedKey(kAColumnRadius, true);
   key_q.Configure([&](Key& k) {
     k.name = "q";
@@ -275,19 +302,6 @@ int main() {
   });
 
   // Caps column
-  Key key_caps;
-  key_caps.Configure([&](Key& k) {
-    k.name = "caps";
-
-    // Absolute:
-    // k.SetPosition(-37.7, 48.06, 15.98);
-    // k.t().ry = -5;
-
-    k.SetParent(key_a);
-    k.SetPosition(-22.597, 4.000, 0.207);
-    k.t().ry = 5;
-  });
-
   Key key_tab = GetRotatedKey(kCapsColumnRadius, true);
   key_tab.Configure([&](Key& k) {
     k.name = "tab";
@@ -317,62 +331,150 @@ int main() {
   };
   // clang-format on
 
-  std::vector<Key*> keys_to_print;
-  PushBackAll(&keys_to_print, thumb_keys);
+  //
+  // Start connecting the keys and building the walls.
+  //
+
+  std::vector<Key*> all_keys;
+  PushBackAll(&all_keys, thumb_keys);
   for (auto keys : key_grid) {
     for (Key* key : keys) {
       if (key != nullptr) {
-        keys_to_print.push_back(key);
+        all_keys.push_back(key);
       }
     }
   }
-  std::vector<Shape> shapes;
-  if (kShowPoints) {
-    shapes.push_back(GetPoints());
-  }
-  Shape s2 = Sphere(1, 30).Color("blue", 0.5);
 
   std::vector<Key*> left_wall_keys = {&key_plus, &key_tab, &key_caps, &key_shift};
   std::vector<Key*> right_wall_keys = {&key_5, &key_t, &key_g, &key_b};
 
   // Adjust the switch widths.
-
   for (Key* key : key_grid[0]) {
-    key->extra_height_top = 2;
+    key->extra_height_top = 8;
   }
+  key_tilda.extra_height_bottom = 6;
+  key_tilda.extra_width_right = 3;
+  key_slash.extra_height_bottom = 8;
+  key_left_arrow.extra_height_bottom = 8;
+  key_slash.extra_width_left = 0;
+
   for (Key* key : left_wall_keys) {
-    key->extra_width_left = 8;
+    key->extra_width_left = 4;
   }
   for (Key* key : right_wall_keys) {
-    key->extra_width_right = 8;
+    key->extra_width_right = 4;
   }
+  // This is shifted out a little to avoid hitting 4. Try to keep the right wall straight
+  key_5.extra_width_right = 3;
+  for (Key* key : GetColumn(key_grid, 2)) {
+    // s column
+    key->extra_width_left = 4;
+  }
+  key_2.extra_width_left += 1.5;
+  key_3.extra_width_left += 1;
+  for (Key* key : GetColumn(key_grid, 1)) {
+    // a column
+    key->extra_width_left = 3;
+  }
+  key_tilda.extra_width_left = 4.5;
+  key_shift.extra_height_bottom = 8;
 
-  std::vector<Shape> golden_points;
+  thumb.extra_height_bottom = 2;
+  thumb.extra_width_left = 2;
+  thumb_delete.extra_height_bottom = 2;
+  thumb_end.extra_height_bottom = 2;
+
+  thumb_ctrl.extra_width_left = 2;
+  thumb_ctrl.extra_height_top = 2;
+  thumb_alt.extra_height_top = 2;
+  thumb_alt.extra_width_right = 2;
+  thumb_alt.extra_width_left = 2;
+  thumb_home.extra_width_right = 2;
+  thumb_home.extra_width_left = 2;
+  thumb_home.extra_height_top = 2;
+  thumb_end.extra_height_top = 2;
+  thumb_end.extra_width_right = 2;
+  thumb_end.extra_width_left = 2;
+  thumb_delete.extra_width_left = 2;
+
+  for (Key* key : thumb_keys) {
+    key->extra_z += 1;
+  }
+  key_5.extra_z += 1.5;
+
   // Keys are measured from the tip of the switch and keys are measured from the tip of the cap.
   // amount.
   double switch_top_z_offset = 10;
-  for (Key* key : keys_to_print) {
-    Shape key_point = key->GetTransforms().Apply(s2);
-    golden_points.push_back(key_point);
-    if (kShowPoints) {
-      shapes.push_back(key_point);
-    }
-    shapes.push_back(key_point);
-
+  for (Key* key : all_keys) {
     key->AddTransform();
     key->t().z -= 10;
     key->disable_switch_z_offset = true;
-    key->add_side_nub = false;
-    key->extra_z = 4;
-    shapes.push_back(key->GetSwitch());
-    // shapes.push_back(key->GetCap());
   }
 
-  shapes.push_back(Import("../things/points.stl").Color("red", 0.5));
-  shapes.push_back(ConnectMainKeys(key_grid));
+  std::vector<Shape> shapes;
+  for (Key* key : all_keys) {
+    key->add_side_nub = false;
+    key->extra_z += 2;
+    shapes.push_back(key->GetSwitch());
+  }
 
-  double wall_connector_offset = -2;
-  std::vector<TransformList> right_wall_points = {
+  shapes.push_back(ConnectMainKeys(key_grid));
+  shapes.push_back(ConnectHorizontal(thumb, thumb_delete));
+  shapes.push_back(ConnectVertical(thumb_ctrl, thumb_delete));
+
+  double wall_connector_offset = -1;
+  Shape wall_connector = Cube(2,2,4).TranslateZ(-2);
+  // The bottom left corner is a little messy. Add another point to try and clean it up.
+  TransformList extra_tilda_wall_point = key_shift.GetBottomRight(wall_connector_offset);
+  {
+    Transform& t = extra_tilda_wall_point.AddTransformFront();
+    t.x = 2;
+    t.y = 0;
+  }
+
+  // Also messy where main meets thumb
+  TransformList extra_thumb_wall_point = key_right_arrow.GetBottomRight(wall_connector_offset);
+  {
+    Transform& t = extra_thumb_wall_point.AddTransformFront();
+    t.x = 0;
+    t.y = -2;
+    t.z = -4;
+  }
+  TransformList extra_thumb_top_wall_point = thumb_ctrl.GetTopLeft(wall_connector_offset);
+  {
+    Transform& t = extra_thumb_top_wall_point.AddTransformFront();
+    t.x = -6;
+    t.z = -4;
+  }
+
+  std::vector<TransformList> main_wall_points = {
+      key_shift.GetBottomRight(wall_connector_offset),
+      key_shift.GetBottomLeft(wall_connector_offset),
+      key_shift.GetTopLeft(wall_connector_offset),
+
+      key_caps.GetBottomLeft(wall_connector_offset),
+      key_caps.GetTopLeft(wall_connector_offset),
+
+      key_tab.GetBottomLeft(wall_connector_offset),
+      key_tab.GetTopLeft(wall_connector_offset),
+
+      key_plus.GetBottomLeft(wall_connector_offset),
+      key_plus.GetTopLeft(wall_connector_offset),
+      key_plus.GetTopRight(wall_connector_offset),
+
+      key_1.GetTopLeft(wall_connector_offset),
+      key_1.GetTopRight(wall_connector_offset),
+
+      key_2.GetTopLeft(wall_connector_offset),
+      key_2.GetTopRight(wall_connector_offset),
+
+      key_3.GetTopLeft(wall_connector_offset),
+      key_3.GetTopRight(wall_connector_offset),
+
+      key_4.GetTopLeft(wall_connector_offset),
+      key_4.GetTopRight(wall_connector_offset),
+
+      key_5.GetTopLeft(wall_connector_offset),
       key_5.GetTopRight(wall_connector_offset),
       key_5.GetBottomRight(wall_connector_offset),
 
@@ -383,36 +485,115 @@ int main() {
       key_g.GetBottomRight(wall_connector_offset),
 
       key_b.GetTopRight(wall_connector_offset),
-      key_b.GetBottomRight(wall_connector_offset),
-  };
-  std::vector<TransformList> left_wall_points = {
-      key_plus.GetTopLeft(wall_connector_offset),
-      key_plus.GetBottomLeft(wall_connector_offset),
 
-      key_tab.GetTopLeft(wall_connector_offset),
-      key_tab.GetBottomLeft(wall_connector_offset),
+      extra_thumb_top_wall_point,
 
-      key_caps.GetTopLeft(wall_connector_offset),
-      key_caps.GetBottomLeft(wall_connector_offset),
+      thumb_ctrl.GetTopLeft(wall_connector_offset),
+      thumb_ctrl.GetTopRight(wall_connector_offset),
 
-      key_shift.GetTopLeft(wall_connector_offset),
-      key_shift.GetBottomLeft(wall_connector_offset),
+      thumb_alt.GetTopLeft(wall_connector_offset),
+      thumb_alt.GetTopRight(wall_connector_offset),
+      thumb_alt.GetBottomRight(wall_connector_offset),
+
+      thumb_home.GetTopRight(wall_connector_offset),
+      thumb_home.GetBottomRight(wall_connector_offset),
+
+      thumb_end.GetTopRight(wall_connector_offset),
+      thumb_end.GetBottomRight(wall_connector_offset),
+      thumb_end.GetBottomLeft(wall_connector_offset),
+
+      thumb_delete.GetBottomRight(wall_connector_offset),
+      thumb_delete.GetBottomLeft(wall_connector_offset),
+
+      thumb.GetBottomRight(wall_connector_offset),
+      thumb.GetBottomLeft(wall_connector_offset),
+
+      extra_thumb_wall_point,
   };
-  auto get_wall_post = [](TransformList t) {
-    Shape s = t.Apply(Cube(4).TranslateZ(-2));
-    return Hull(s, s.Projection().LinearExtrude(.01));
+
+
+  std::vector<TransformList> bottom_wall_points = {
+      extra_tilda_wall_point,
+      key_tilda.GetTopLeft(wall_connector_offset),
+      key_tilda.GetBottomLeft(wall_connector_offset),
+      key_tilda.GetBottomRight(wall_connector_offset),
+
+      key_slash.GetBottomLeft(wall_connector_offset),
+      key_slash.GetBottomRight(wall_connector_offset),
+
+      key_left_arrow.GetBottomLeft(wall_connector_offset),
+      key_left_arrow.GetBottomRight(wall_connector_offset),
+
+      extra_thumb_wall_point,
   };
-  for (size_t i = 0; i < left_wall_points.size() - 1; ++i) {
-    shapes.push_back(
-        Hull(get_wall_post(left_wall_points[i]), get_wall_post(left_wall_points[i + 1])));
-  }
-  for (size_t i = 0; i < right_wall_points.size() - 1; ++i) {
-    shapes.push_back(
-        Hull(get_wall_post(right_wall_points[i]), get_wall_post(right_wall_points[i + 1])));
+  std::vector<TransformList> thumb_wall_points = {
+      // key_right_arrow.GetBottomRight(wall_connector_offset),
+      extra_thumb_wall_point,
+
+      thumb.GetBottomLeft(wall_connector_offset),
+      thumb.GetBottomRight(wall_connector_offset),
+
+      thumb_delete.GetBottomLeft(wall_connector_offset),
+      thumb_delete.GetBottomRight(wall_connector_offset),
+
+      thumb_end.GetBottomLeft(wall_connector_offset),
+      thumb_end.GetBottomRight(wall_connector_offset),
+      thumb_end.GetTopRight(wall_connector_offset),
+
+      thumb_home.GetBottomRight(wall_connector_offset),
+      thumb_home.GetTopRight(wall_connector_offset),
+
+      thumb_alt.GetBottomRight(wall_connector_offset),
+      thumb_alt.GetTopRight(wall_connector_offset),
+      thumb_alt.GetTopLeft(wall_connector_offset),
+
+      thumb_ctrl.GetTopRight(wall_connector_offset),
+      thumb_ctrl.GetTopLeft(wall_connector_offset),
+      extra_thumb_top_wall_point,
+      // key_b.GetBottomRight(wall_connector_offset),
+  };
+
+  auto make_wall = [=](const std::vector<TransformList>& points) {
+    auto get_wall_post = [=](TransformList t) {
+      Shape s = t.Apply(wall_connector);
+      return Hull(s, s.Projection().LinearExtrude(.01));
+    };
+    std::vector<Shape> wall_shapes;
+    for (size_t i = 0; i < points.size() - 1; ++i) {
+      wall_shapes.push_back(Hull(get_wall_post(points[i]), get_wall_post(points[i + 1])));
+    }
+    return UnionAll(wall_shapes);
+  };
+
+  shapes.push_back(make_wall(main_wall_points));
+  shapes.push_back(make_wall(bottom_wall_points));
+  //shapes.push_back(make_wall(thumb_wall_points));
+
+  // Connect up thumb to main keys.
+  shapes.push_back(Tri(extra_thumb_top_wall_point,
+                       thumb_ctrl.GetTopLeft(wall_connector_offset),
+                       thumb_delete.GetTopLeft(wall_connector_offset),
+                       wall_connector));
+  {
+    TransformList b_point = key_b.GetBottomRight();
+    Transform& b_t = b_point.AddTransformFront();
+    b_t.x = -2;
+    b_t.z = -4;
+    b_t.y = 1;
+
+    TransformList a_point = key_right_arrow.GetTopRight(-1);
+    Transform& a_t = a_point.AddTransformFront();
+    a_t.x = 4;
+    a_t.y = 2.5;
+
+    shapes.push_back(Hull(thumb_delete.GetTopLeft(wall_connector_offset).Apply(wall_connector),
+                          b_point.Apply(wall_connector),
+                          a_point.Apply(wall_connector),
+                          thumb.GetTopLeft(wall_connector_offset).Apply(wall_connector),
+                          key_right_arrow.GetTopRight(0).Apply(wall_connector)));
   }
 
   UnionAll(shapes).WriteToFile("measure.scad");
-  UnionAll(golden_points).WriteToFile("points.scad");
 }
 
 Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
@@ -453,7 +634,8 @@ Shape ConnectMainKeys(const std::vector<std::vector<Key*>>& key_grid) {
       if (top != nullptr) {
         shapes.push_back(ConnectVertical(*top, *key));
         if (left != nullptr && top_left != nullptr) {
-          shapes.push_back(ConnectDiagonal(*top_left, *top, *key, *left, GetCapsuleConnector(), -1));
+          shapes.push_back(
+              ConnectDiagonal(*top_left, *top, *key, *left, GetCapsuleConnector(), -1));
         }
       }
     }
@@ -501,143 +683,3 @@ Key GetRotatedKey(double radius, bool up) {
     is_first = false;
   }
 }
-
-Shape GetPoints() {
-  glm::vec3 p_3(25.66, 85.85, 30.1);
-  glm::vec3 p_e(27.51, 69.14, 21.06);
-  glm::vec3 p_d(27.45, 52.44, 17.13);
-  glm::vec3 p_c(26.57, 34.7, 19.8);
-  glm::vec3 p_left_arrow(23.8, 17.64, 28.49);
-
-  glm::vec3 p_4(40.4, 84.05, 35.93);
-  glm::vec3 p_r(43.39, 67.27, 29.52);
-  glm::vec3 p_f(43.99, 47.96, 27.15);
-  glm::vec3 p_v(43.15, 30.82, 29.63);
-  glm::vec3 p_right_arrow(39.66, 13.72, 33.82);
-
-  glm::vec3 p_5(56.74, 81.46, 46.84);
-  glm::vec3 p_t(59.14, 63.05, 39.76);
-  glm::vec3 p_g(59.63, 46.97, 36.22);
-  glm::vec3 p_b(59.06, 28.93, 38.00);
-
-  glm::vec3 p_2(5.49, 85.47, 26.82);
-  glm::vec3 p_w(5.49, 67.57, 20.03);
-  glm::vec3 p_s(5.44, 50.72, 17.44);
-  glm::vec3 p_x(4.39, 31.48, 19.24);
-
-  double xoff = 69.84 - 5.44;
-
-  glm::vec3 p_plus(27.05 - xoff, 81.79, 26.94);
-  glm::vec3 p_1(48.58 - xoff, 79.36, 27.47);
-
-  glm::vec3 p_tab(27.14 - xoff, 66.13, 18.48);
-  glm::vec3 p_q(49.12 - xoff, 62.06, 21.59);
-
-  glm::vec3 p_caps(26.56 - xoff, 48.09, 15.77);
-  glm::vec3 p_a(48.67 - xoff, 44.18, 19.37);
-
-  glm::vec3 p_shift(25.5 - xoff, 30.34, 19);
-  glm::vec3 p_z(47.58 - xoff, 25.86, 21.87);
-
-  glm::vec3 p_tilda(46 - xoff, 8.91, 28.73);
-  glm::vec3 p_slash(3.35, 14.74, 25.84);
-
-  glm::vec3 p_backspace(60, -9.18, 42.83);
-  glm::vec3 p_delete(77.71, -16, 42.78);
-  glm::vec3 p_ctrl(87.27, 9.95, 48.94);
-  glm::vec3 p_alt(104.74, 4, 48.75);
-
-  Shape s = Sphere(1, 30).Color("red", 0.5);
-
-  glm::vec3 pp_e(25.84, 68.15, 20.8);
-  glm::vec3 pp_3(24.64, 84.84, 30.22);
-  glm::vec3 pp_c(25.67, 32.65, 20.8);
-  glm::vec3 pp_left_arrow(22.13, 15.90, 28.38);
-
-  glm::vec3 pp_caps(-37.7, 48.06, 15.98);
-  glm::vec3 pp_a(-15.41, 44.06, 19.7);
-  glm::vec3 pp_s(6.09, 50.23, 18.05);
-  glm::vec3 pp_d(26.40, 50.32, 17.87);
-  glm::vec3 pp_f(44.3, 49.37, 28.1);
-  glm::vec3 pp_g(60.16, 48.06, 37.39);
-
-  printf("%.3f\n", glm::length(pp_g - pp_f));
-
-  Shape s2 = s.Color("green", 0.5);
-
-  return Union(s.Translate(p_backspace),
-               s.Translate(p_delete),
-               s.Translate(p_ctrl),
-               s.Translate(p_alt),
-               s.Translate(p_plus),
-               s.Translate(p_1),
-               s.Translate(p_tab),
-               s.Translate(p_caps),
-               s.Translate(p_shift),
-               s.Translate(p_q),
-               s.Translate(p_a),
-               s.Translate(p_z),
-               s.Translate(p_tilda),
-               s.Translate(p_slash),
-               s.Translate(p_2),
-               s.Translate(p_w),
-               s.Translate(p_s),
-               s.Translate(p_x),
-               s.Translate(p_5),
-               s.Translate(p_t),
-               s.Translate(p_g),
-               s.Translate(p_b),
-               s.Translate(p_e),
-               s.Translate(p_c),
-               s.Translate(p_v),
-               s.Translate(p_r),
-               s.Translate(p_left_arrow),
-               s.Translate(p_right_arrow),
-               s.Translate(p_3),
-               s.Translate(p_4),
-               s.Translate(p_d),
-               s.Translate(p_f),
-
-               s2.Translate(pp_d),
-               s2.Translate(pp_e),
-               s2.Translate(pp_3),
-               s2.Translate(pp_c),
-               s2.Translate(pp_s),
-               s2.Translate(pp_f),
-               s2.Translate(pp_g),
-               s2.Translate(pp_a),
-               s2.Translate(pp_caps),
-               s2.Translate(pp_left_arrow));
-}
-
-/*
-double r = 50;
-std::vector<Shape> arcs;
-for (int i = 0; i < 5; ++i) {
-  Shape ss = Sphere(.5, 20);
-  Key up1 = GetRotatedKey(18, r, true);
-  Key up2 = GetRotatedKey(36, r, true);
-  Key down1 = GetRotatedKey(18, r, false);
-
-  Shape arc = Union(Hull(ss, up1.GetTransforms().Apply(ss)),
-                    Hull(up1.GetTransforms().Apply(ss), up2.GetTransforms().Apply(ss)),
-                    Hull(down1.GetTransforms().Apply(ss), ss))
-                  .RotateY(90);
-  arcs.push_back(arc.Projection().LinearExtrude(1.5).TranslateX(i * 10));
-  r += 5;
-}
- UnionAll(arcs).WriteToFile("measure.scad");
-*/
-
-/*
-Key base;
-base.t().ry = 10;
-Key other;
-other.Configure([&](Key& k) {
-  k.SetParent(base);
-  k.SetPosition(-22.29, 4, -3.72);
-});
-
-glm::vec3 rel = other.GetTransforms().Apply(kOrigin);
-printf("k.SetPosition(%.3f, %.3f, %.3f);\n", rel.x, rel.y, rel.z);
-*/

@@ -97,6 +97,9 @@ struct Key {
 
   Shape GetSwitch() const;
   Shape GetInverseSwitch() const;
+  // Used to subtract and clear space in the key cap's path. Vertical length
+  // can be explicitly passed to support cutting out for long keys like enter on the kinesis.
+  Shape GetInverseCap(double custom_vertical_length = -1) const;
   Shape GetCap(bool fill_in_cap_path = false) const;
 
   // This is the outermost conner of the switch. You can specify an offset to scale the point back

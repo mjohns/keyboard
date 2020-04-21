@@ -5,7 +5,7 @@ This repo defines utilities for generating keyboard related OpenSCAD files using
  [dactyl_manuform](https://github.com/abstracthat/dactyl-manuform).
  Major thanks to Matthew Adereth and Tom Short for their work.
 
-The souce of truth for scad.h/cc is [here](https://github.com/mjohns/scap-cpp)
+The souce of truth for scad.h/cc is [here](https://github.com/mjohns/scad-cpp)
 
 Below are keyboards built using this library. They serve as good examples for how to use the library.
 

@@ -3,6 +3,7 @@
 #include <cassert>
 #include <memory>
 #include <unordered_set>
+#include <vector>
 
 #include "scad.h"
 #include "transform.h"
@@ -83,6 +84,7 @@ Shape MakeDsaCap() {
   });
 }
 
+// Note: the dimensions don't seem 100% accurate.
 Shape MakeSaCapPretty() {
   Shape c = Cylinder({.h = 33, .r1 = 33, .r2 = 33, .fn = 200, .center = false});
   Shape cap = Intersection(c.Rotate(90, 0, 0).Translate(24, 16, 0),
@@ -182,7 +184,7 @@ Shape Key::GetInverseCap(double custom_vertical_length) const {
   if (custom_vertical_length > 0) {
     height = custom_vertical_length;
   }
-  return Cube(width, height, 30).TranslateZ(15);
+  return GetTransforms().Apply(Cube(width, height, 30).TranslateZ(15));
 }
 
 Shape Key::GetSwitch() const {
@@ -196,13 +198,13 @@ Shape Key::GetSwitch() const {
   } else {
     shapes.push_back(GetSwitchTransforms().Apply(MakeSwitch(add_side_nub)));
   }
-  if (extra_height_top > 0) {
+  if (extra_width_top > 0) {
     shapes.push_back(Hull(GetTopRight().Apply(GetPostConnector()),
                           GetTopRightInternal().Apply(GetPostConnector()),
                           GetTopLeftInternal().Apply(GetPostConnector()),
                           GetTopLeft().Apply(GetPostConnector())));
   }
-  if (extra_height_bottom > 0) {
+  if (extra_width_bottom > 0) {
     shapes.push_back(Hull(GetBottomLeft().Apply(GetPostConnector()),
                           GetBottomLeftInternal().Apply(GetPostConnector()),
                           GetBottomRightInternal().Apply(GetPostConnector()),
@@ -261,7 +263,7 @@ Shape Key::GetCap(bool fill_in_cap_path) const {
 
 TransformList Key::GetTopRight(double offset) const {
   TransformList transforms;
-  transforms.AddTransform({extra_width_right + offset, extra_height_top + offset, 0});
+  transforms.AddTransform({extra_width_right + offset, extra_width_top + offset, 0});
   return transforms.Append(GetTopRightInternal());
 }
 
@@ -273,7 +275,7 @@ TransformList Key::GetTopRightInternal() const {
 
 TransformList Key::GetTopLeft(double offset) const {
   TransformList transforms;
-  transforms.AddTransform({-1 * (extra_width_left + offset), extra_height_top + offset, 0});
+  transforms.AddTransform({-1 * (extra_width_left + offset), extra_width_top + offset, 0});
   return transforms.Append(GetTopLeftInternal());
 }
 
@@ -285,7 +287,7 @@ TransformList Key::GetTopLeftInternal() const {
 
 TransformList Key::GetBottomRight(double offset) const {
   TransformList transforms;
-  transforms.AddTransform({extra_width_right + offset, -1 * (extra_height_bottom + offset), 0});
+  transforms.AddTransform({extra_width_right + offset, -1 * (extra_width_bottom + offset), 0});
   return transforms.Append(GetBottomRightInternal());
 }
 
@@ -298,7 +300,7 @@ TransformList Key::GetBottomRightInternal() const {
 TransformList Key::GetBottomLeft(double offset) const {
   TransformList transforms;
   transforms.AddTransform(
-      {-1 * (extra_width_left + offset), -1 * (extra_height_bottom + offset), 0});
+      {-1 * (extra_width_left + offset), -1 * (extra_width_bottom + offset), 0});
   return transforms.Append(GetBottomLeftInternal());
 }
 
@@ -316,27 +318,8 @@ std::vector<TransformList> Key::GetCorners(double offset) const {
   return {GetTopLeft(offset), GetTopRight(offset), GetBottomRight(offset), GetBottomLeft(offset)};
 }
 
-Shape GetCapsuleConnector() {
-  Shape s = Cube(2, 2, kSwitchThickness);
-  return s.TranslateZ(kSwitchThickness / -2);
-  /*
-  // Expensive to render
-  SphereParams params;
-  params.r = 1;
-  params.fn = 20;
-  return Hull(Sphere(params).TranslateZ(-1), Sphere(params).TranslateZ(-3));
-  */
-}
-
-Shape GetSphereConnector() {
-  SphereParams params;
-  params.r = 2;
-  params.fn = 30;
-  return Sphere(params).TranslateZ(-2);
-}
-
 Shape GetPostConnector() {
-  return Cube(.01, .01, kSwitchThickness).TranslateZ(kSwitchThickness / -2.0);
+  return Cube(.01, .01, 3.5).TranslateZ(3.5 / -2.0);
 }
 
 Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector, double offset) {
@@ -375,7 +358,57 @@ Shape Tri(const TransformList& t1,
           const TransformList& t2,
           const TransformList& t3,
           Shape connector) {
-  return Hull(t1.Apply(connector), t2.Apply(connector), t3.Apply(connector));
+  return Tri(t1.Apply(connector), t2.Apply(connector), t3.Apply(connector));
+}
+
+Shape Tri(const Shape& s1, const Shape& s2, const Shape& s3) {
+  return Hull(s1, s2, s3);
+}
+
+Shape TriHull(const TransformList& t1,
+              const TransformList& t2,
+              const TransformList& t3,
+              const TransformList& t4,
+              Shape connector) {
+  return TriMesh({t1, t2, t3, t4}, connector);
+}
+
+Shape TriHull(const Shape& s1, const Shape& s2, const Shape& s3, const Shape& s4) {
+  return TriMesh({s1, s2, s3, s4});
+}
+
+Shape TriFan(const TransformList& center,
+             const std::vector<TransformList>& transforms,
+             Shape connector) {
+  std::vector<Shape> shapes;
+  for (auto& t : transforms) {
+    shapes.push_back(t.Apply(connector));
+  }
+  return TriFan(center.Apply(connector), shapes);
+}
+
+Shape TriFan(Shape center, const std::vector<Shape>& shapes) {
+  std::vector<Shape> result;
+  for (size_t i = 0; i < shapes.size() - 1; ++i) {
+    result.push_back(Hull(center, shapes[i], shapes[i + 1]));
+  }
+  return UnionAll(result);
+}
+
+Shape TriMesh(const std::vector<TransformList>& transforms, Shape connector) {
+  std::vector<Shape> shapes;
+  for (auto& t : transforms) {
+    shapes.push_back(t.Apply(connector));
+  }
+  return TriMesh(shapes);
+}
+
+Shape TriMesh(const std::vector<Shape>& shapes) {
+  std::vector<Shape> result;
+  for (size_t i = 0; i < shapes.size() - 2; ++i) {
+    result.push_back(Hull(shapes[i], shapes[i + 1], shapes[i + 2]));
+  }
+  return UnionAll(result);
 }
 
 }  // namespace scad

@@ -9,6 +9,8 @@ namespace scad {
 
 const glm::vec3 kOrigin(0, 0, 0);
 
+// A rotation and translation. The rotations are applied first in z,x,y order and then the
+// translation is added.
 struct Transform {
  public:
   float x = 0;
@@ -23,10 +25,7 @@ struct Transform {
   Transform() {
   }
 
-  Transform(double px, double py, double pz) {
-    x = px;
-    y = py;
-    z = pz;
+  Transform(double x, double y, double z) : x(x), y(y), z(z) {
   }
 
   Transform(const glm::vec3& t) {
@@ -35,8 +34,42 @@ struct Transform {
     z = t.z;
   }
 
+  static Transform Translation(double x, double y, double z) {
+    return Transform(x, y, z);
+  }
+
+  static Transform Rotation(double rx, double ry, double rz) {
+    Transform t;
+    t.rx = rx;
+    t.ry = ry;
+    t.rz = rz;
+    return t;
+  }
+
   glm::vec3 translation() const {
     return glm::vec3(x, y, z);
+  }
+
+  Transform& SetRotationX(double rotation) {
+    rx = rotation;
+    return *this;
+  }
+
+  Transform& SetRotationY(double rotation) {
+    ry = rotation;
+    return *this;
+  }
+
+  Transform& SetRotationZ(double rotation) {
+    rz = rotation;
+    return *this;
+  }
+
+  Transform& SetRotation(double rx, double ry, double rz) {
+    this->rx = rx;
+    this->ry = ry;
+    this->rz = rz;
+    return *this;
   }
 
   Shape Apply(const Shape& in) const {
@@ -59,6 +92,9 @@ struct Transform {
   glm::vec3 Apply(const glm::vec3& p) const;
 };
 
+// A list of transforms to apply to a shape or a point. The transforms are applied in order. If you
+// are looking at a shape which has been placed by a transform list and you want to rotate it in
+// place, the transform you add needs to be applied first and you must use a "front" method.
 class TransformList {
  public:
   Shape Apply(const Shape& shape) const;
@@ -103,6 +139,16 @@ class TransformList {
     return *this;
   }
 
+  TransformList& RotateFront(float rx, float ry, float rz) {
+    AddTransformFront(Transform::Rotation(rx, ry, rz));
+    return *this;
+  }
+
+  TransformList& TranslateFront(float x, float y, float z) {
+    AddTransformFront({x, y, z});
+    return *this;
+  }
+
   TransformList& Translate(float x, float y, float z) {
     AddTransform({x, y, z});
     return *this;
@@ -126,6 +172,11 @@ class TransformList {
 
   TransformList& Append(const TransformList& other) {
     transforms_.insert(transforms_.end(), other.transforms_.begin(), other.transforms_.end());
+    return *this;
+  }
+
+  TransformList& AppendFront(const TransformList& other) {
+    transforms_.insert(transforms_.begin(), other.transforms_.begin(), other.transforms_.end());
     return *this;
   }
 

@@ -72,6 +72,7 @@ struct Key {
   double extra_z = 0;
 
   bool add_side_nub = true;
+  bool add_top_nub = false;
   bool disable_switch_z_offset = false;
 
   KeyType type = KeyType::DSA;
@@ -179,7 +180,7 @@ struct KeyGrid {
 // Used to connect key corners together. It is thin so it can have width issues when the two
 // connectors being hulled don't have a large projection on one another. (keys close together with
 // vertical separation)
-Shape GetPostConnector();
+Shape GetPostConnector(double width = .01);
 
 Shape ConnectVertical(const Key& top,
                       const Key& bottom,
@@ -223,6 +224,6 @@ Shape MakeDsaCap();
 Shape MakeSaCap();
 Shape MakeSaEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
 Shape MakeSaTallEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
-Shape MakeSwitch(bool add_side_nub = true);
+Shape MakeSwitch(bool add_side_nub = true, bool add_top_nub = false);
 
 }  // namespace scad
